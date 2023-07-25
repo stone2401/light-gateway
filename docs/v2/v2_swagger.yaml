@@ -1,0 +1,24 @@
+basePath: /api/v2
+host: 127.0.0.1:2401
+info:
+  contact:
+    email: stone2401@qq.com
+  description: 一个轻量级网关代理，支持多种代理协议，接口转发，数据统计，带有管理界面
+  title: 轻量级网关
+  version: "1.0"
+paths:
+  /ping:
+    get:
+      description: 检测接口
+      responses:
+        "200":
+          description: pong
+          schema:
+            type: string
+      tags:
+      - api-v1
+schemes:
+- http
+swagger: "2.0"
+tags:
+- name: example

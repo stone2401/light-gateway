@@ -39,12 +39,12 @@ func (a *Admin) LoginCheck(param *dto.AdminLoginRequest) error {
 
 // 以自身为条件，以参数为更新
 func (a *Admin) Update(newAdmin *Admin) error {
-	_, err := DBEngine.ID(a.Id).Update(newAdmin)
+	_, err := GetDBDriver().ID(a.Id).Update(newAdmin)
 	return err
 }
 
 func (m *Admin) Find() (err error) {
-	b, err := DBEngine.Get(m)
+	b, err := GetDBDriver().Get(m)
 	if err != nil {
 		return err
 	}
@@ -56,7 +56,7 @@ func (m *Admin) Find() (err error) {
 
 // 以自身为条件，判断是否存在
 func (m *Admin) Exist(tag string) error {
-	ok, err := DBEngine.Exist(m)
+	ok, err := GetDBDriver().Exist(m)
 	if ok {
 		return errors.New(tag + "已存在" + public.EndMark)
 	}

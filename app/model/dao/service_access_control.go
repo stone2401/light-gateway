@@ -23,7 +23,7 @@ func (s *ServiceAccessControl) GetId() uint64 {
 }
 
 func (m *ServiceAccessControl) Find() (err error) {
-	b, err := DBEngine.Get(m)
+	b, err := GetDBDriver().Get(m)
 	if err != nil {
 		return err
 	}
@@ -35,7 +35,7 @@ func (m *ServiceAccessControl) Find() (err error) {
 
 // 以自身为条件，判断是否存在
 func (m *ServiceAccessControl) Exist(tag string) error {
-	ok, err := DBEngine.Exist(m)
+	ok, err := GetDBDriver().Exist(m)
 	if ok {
 		return errors.New(tag + "已存在" + public.EndMark)
 	}

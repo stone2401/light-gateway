@@ -1,4 +1,640 @@
 basePath: /api/v2
+definitions:
+  dao.App:
+    properties:
+      app_id:
+        type: string
+      create_at:
+        type: string
+      delete_at:
+        type: string
+      id:
+        type: integer
+      is_delete:
+        type: integer
+      name:
+        type: string
+      qpd:
+        type: integer
+      qps:
+        type: integer
+      secret:
+        type: string
+      update_at:
+        type: string
+      white_ips:
+        type: string
+    type: object
+  dto.AdminChangeRequest:
+    properties:
+      new_password:
+        type: string
+      old_password:
+        type: string
+    type: object
+  dto.AdminInfoResponse:
+    properties:
+      avatar:
+        type: string
+      id:
+        type: integer
+      introduction:
+        type: string
+      login_time:
+        type: string
+      name:
+        type: string
+      roles:
+        items:
+          type: string
+        type: array
+    type: object
+  dto.AdminLoginRequest:
+    properties:
+      password:
+        example: admin
+        type: string
+      username:
+        example: admin
+        type: string
+    type: object
+  dto.AdminLoginResponse:
+    properties:
+      token:
+        type: string
+    type: object
+  dto.AppListItem:
+    properties:
+      app_id:
+        type: string
+      id:
+        type: integer
+      name:
+        type: string
+      qpd:
+        type: integer
+      qps:
+        type: integer
+      real_qpd:
+        type: integer
+      real_qps:
+        type: integer
+      secret:
+        type: string
+      white_ips:
+        type: string
+    type: object
+  dto.AppListResponse:
+    properties:
+      list:
+        items:
+          $ref: '#/definitions/dto.AppListItem'
+        type: array
+      total:
+        type: integer
+    type: object
+  dto.PanelGroupDataResponse:
+    properties:
+      app_num:
+        type: integer
+      current_qps:
+        type: integer
+      service_num:
+        type: integer
+      today_request_num:
+        type: integer
+    type: object
+  dto.ServiceAddGrpcRequest:
+    properties:
+      black_list:
+        description: 黑名单
+        example: ""
+        type: string
+      clientip_flow_limit:
+        description: 客户端ip限流
+        example: 0
+        type: integer
+      forbid_list:
+        description: 禁用ip列表
+        example: ""
+        type: string
+      header_transfor:
+        description: 'header转换支持增加(add)、删除(del)、修改(edit) 格式: add headname headvalue
+          多个逗号间隔'
+        example: ""
+        type: string
+      ip_list:
+        description: ip列表
+        example: 47.113.203.197:2401
+        type: string
+      open_auth:
+        description: service_access_control 表字段
+        example: false
+        type: boolean
+      port:
+        description: service_hrrp_rule 表字段
+        type: integer
+      round_type:
+        description: service_load_balance 表字段
+        example: 0
+        type: integer
+      service_desc:
+        description: 服务描述
+        example: 必填 服务描述
+        type: string
+      service_flow_limit:
+        description: 服务的限流
+        example: 0
+        type: integer
+      service_name:
+        description: service_info 表字段
+        example: 必填 服务名称
+        type: string
+      upstream_connect_timeout:
+        description: 建立连接超时, 单位s
+        example: 0
+        type: integer
+      upstream_header_timeout:
+        description: 获取header超时, 单位s
+        example: 0
+        type: integer
+      upstream_idle_timeout:
+        description: 链接最大空闲时间, 单位s
+        example: 0
+        type: integer
+      upstream_max_idle:
+        description: 最大空闲链接数
+        example: 0
+        type: integer
+      weight_list:
+        description: 权重列表
+        example: "10"
+        type: string
+      white_list:
+        description: 白名单
+        example: ""
+        type: string
+    type: object
+  dto.ServiceAddHttpRequest:
+    properties:
+      black_list:
+        description: 黑名单
+        example: ""
+        type: string
+      clientip_flow_limit:
+        description: 客户端ip限流
+        example: 0
+        type: integer
+      forbid_list:
+        description: 禁用ip列表
+        example: ""
+        type: string
+      header_transfor:
+        description: 'header转换支持增加(add)、删除(del)、修改(edit) 格式: add headname headvalue
+          多个逗号间隔'
+        example: ""
+        type: string
+      ip_list:
+        description: ip列表
+        example: 47.113.203.197:2401
+        type: string
+      need_https:
+        description: 支持https 1=支持
+        example: false
+        type: boolean
+      need_strip_url:
+        description: 启用strip_uri 1=启用
+        example: false
+        type: boolean
+      need_websocket:
+        description: 是否支持websocket 1=支持
+        example: false
+        type: boolean
+      open_auth:
+        description: service_access_control 表字段
+        example: false
+        type: boolean
+      round_type:
+        description: service_load_balance 表字段
+        example: 0
+        type: integer
+      rule:
+        description: type=domain表示域名，type=url_prefix时表示url前缀
+        example: 必填 域名或后缀
+        type: string
+      rule_type:
+        description: 匹配类型 0=url前缀url_prefix 1=域名domain
+        example: 0
+        type: integer
+      service_desc:
+        description: 服务描述
+        example: 必填 服务描述
+        type: string
+      service_flow_limit:
+        description: 服务的限流
+        example: 0
+        type: integer
+      service_name:
+        description: service_info 表字段
+        example: 必填 服务名称
+        type: string
+      upstream_connect_timeout:
+        description: 建立连接超时, 单位s
+        example: 0
+        type: integer
+      upstream_header_timeout:
+        description: 获取header超时, 单位s
+        example: 0
+        type: integer
+      upstream_idle_timeout:
+        description: 链接最大空闲时间, 单位s
+        example: 0
+        type: integer
+      upstream_max_idle:
+        description: 最大空闲链接数
+        example: 0
+        type: integer
+      url_rewrite:
+        description: url重写功能 格式：^/gatekeeper/test_service(.*) $1 多个逗号间隔
+        example: ""
+        type: string
+      weight_list:
+        description: 权重列表
+        example: "10"
+        type: string
+      white_list:
+        description: 白名单
+        example: ""
+        type: string
+    type: object
+  dto.ServiceAddTcpRequest:
+    properties:
+      black_list:
+        description: 黑名单
+        example: ""
+        type: string
+      clientip_flow_limit:
+        description: 客户端ip限流
+        example: 0
+        type: integer
+      forbid_list:
+        description: 禁用ip列表
+        example: ""
+        type: string
+      ip_list:
+        description: ip列表
+        example: 47.113.203.197:2401
+        type: string
+      open_auth:
+        description: service_access_control 表字段
+        example: false
+        type: boolean
+      port:
+        description: service_hrrp_rule 表字段
+        type: integer
+      round_type:
+        description: service_load_balance 表字段
+        example: 0
+        type: integer
+      service_desc:
+        description: 服务描述
+        example: 必填 服务描述
+        type: string
+      service_flow_limit:
+        description: 服务的限流
+        example: 0
+        type: integer
+      service_name:
+        description: service_info 表字段
+        example: 必填 服务名称
+        type: string
+      upstream_connect_timeout:
+        description: 建立连接超时, 单位s
+        example: 0
+        type: integer
+      upstream_header_timeout:
+        description: 获取header超时, 单位s
+        example: 0
+        type: integer
+      upstream_idle_timeout:
+        description: 链接最大空闲时间, 单位s
+        example: 0
+        type: integer
+      upstream_max_idle:
+        description: 最大空闲链接数
+        example: 0
+        type: integer
+      weight_list:
+        description: 权重列表
+        example: "10"
+        type: string
+      white_list:
+        description: 白名单
+        example: ""
+        type: string
+    type: object
+  dto.ServiceListItem:
+    properties:
+      id:
+        type: integer
+      load_type:
+        type: integer
+      qpd:
+        type: integer
+      qps:
+        type: integer
+      service_addr:
+        type: string
+      service_desc:
+        type: string
+      service_name:
+        type: string
+      total_node:
+        type: integer
+    type: object
+  dto.ServiceListResponse:
+    properties:
+      list:
+        items:
+          $ref: '#/definitions/dto.ServiceListItem'
+        type: array
+      total:
+        type: integer
+    type: object
+  dto.ServiceStatAllItemResponse:
+    properties:
+      name:
+        type: string
+      value:
+        type: integer
+    type: object
+  dto.ServiceStatAllResponse:
+    properties:
+      data:
+        items:
+          $ref: '#/definitions/dto.ServiceStatAllItemResponse'
+        type: array
+      legend:
+        items:
+          type: string
+        type: array
+    type: object
+  dto.ServiceStatResponse:
+    properties:
+      today:
+        items:
+          type: integer
+        type: array
+      yesterday:
+        items:
+          type: integer
+        type: array
+    type: object
+  dto.ServiceUpdateGrpcRequest:
+    properties:
+      black_list:
+        description: 黑名单
+        example: ""
+        type: string
+      clientip_flow_limit:
+        description: 客户端ip限流
+        example: 0
+        type: integer
+      forbid_list:
+        description: 禁用ip列表
+        example: ""
+        type: string
+      header_transfor:
+        description: 'header转换支持增加(add)、删除(del)、修改(edit) 格式: add headname headvalue
+          多个逗号间隔'
+        example: ""
+        type: string
+      id:
+        type: integer
+      ip_list:
+        description: ip列表
+        example: 47.113.203.197:2401
+        type: string
+      open_auth:
+        description: service_access_control 表字段
+        example: false
+        type: boolean
+      port:
+        description: service_hrrp_rule 表字段
+        type: integer
+      round_type:
+        description: service_load_balance 表字段
+        example: 0
+        type: integer
+      service_desc:
+        description: 服务描述
+        example: 必填 服务描述
+        type: string
+      service_flow_limit:
+        description: 服务的限流
+        example: 0
+        type: integer
+      service_name:
+        description: service_info 表字段
+        example: 必填 服务名称
+        type: string
+      upstream_connect_timeout:
+        description: 建立连接超时, 单位s
+        example: 0
+        type: integer
+      upstream_header_timeout:
+        description: 获取header超时, 单位s
+        example: 0
+        type: integer
+      upstream_idle_timeout:
+        description: 链接最大空闲时间, 单位s
+        example: 0
+        type: integer
+      upstream_max_idle:
+        description: 最大空闲链接数
+        example: 0
+        type: integer
+      weight_list:
+        description: 权重列表
+        example: "10"
+        type: string
+      white_list:
+        description: 白名单
+        example: ""
+        type: string
+    type: object
+  dto.ServiceUpdateHttpRequest:
+    properties:
+      black_list:
+        description: 黑名单
+        example: ""
+        type: string
+      clientip_flow_limit:
+        description: 客户端ip限流
+        example: 0
+        type: integer
+      forbid_list:
+        description: 禁用ip列表
+        example: ""
+        type: string
+      header_transfor:
+        description: 'header转换支持增加(add)、删除(del)、修改(edit) 格式: add headname headvalue
+          多个逗号间隔'
+        example: ""
+        type: string
+      id:
+        type: integer
+      ip_list:
+        description: ip列表
+        example: 47.113.203.197:2401
+        type: string
+      need_https:
+        description: 支持https 1=支持
+        example: false
+        type: boolean
+      need_strip_url:
+        description: 启用strip_uri 1=启用
+        example: false
+        type: boolean
+      need_websocket:
+        description: 是否支持websocket 1=支持
+        example: false
+        type: boolean
+      open_auth:
+        description: service_access_control 表字段
+        example: false
+        type: boolean
+      round_type:
+        description: service_load_balance 表字段
+        example: 0
+        type: integer
+      rule:
+        description: type=domain表示域名，type=url_prefix时表示url前缀
+        example: 必填 域名或后缀
+        type: string
+      rule_type:
+        description: 匹配类型 0=url前缀url_prefix 1=域名domain
+        example: 0
+        type: integer
+      service_desc:
+        description: 服务描述
+        example: 必填 服务描述
+        type: string
+      service_flow_limit:
+        description: 服务的限流
+        example: 0
+        type: integer
+      service_name:
+        description: service_info 表字段
+        example: 必填 服务名称
+        type: string
+      upstream_connect_timeout:
+        description: 建立连接超时, 单位s
+        example: 0
+        type: integer
+      upstream_header_timeout:
+        description: 获取header超时, 单位s
+        example: 0
+        type: integer
+      upstream_idle_timeout:
+        description: 链接最大空闲时间, 单位s
+        example: 0
+        type: integer
+      upstream_max_idle:
+        description: 最大空闲链接数
+        example: 0
+        type: integer
+      url_rewrite:
+        description: url重写功能 格式：^/gatekeeper/test_service(.*) $1 多个逗号间隔
+        example: ""
+        type: string
+      weight_list:
+        description: 权重列表
+        example: "10"
+        type: string
+      white_list:
+        description: 白名单
+        example: ""
+        type: string
+    type: object
+  dto.ServiceUpdateTcpRequest:
+    properties:
+      black_list:
+        description: 黑名单
+        example: ""
+        type: string
+      clientip_flow_limit:
+        description: 客户端ip限流
+        example: 0
+        type: integer
+      forbid_list:
+        description: 禁用ip列表
+        example: ""
+        type: string
+      id:
+        type: integer
+      ip_list:
+        description: ip列表
+        example: 47.113.203.197:2401
+        type: string
+      open_auth:
+        description: service_access_control 表字段
+        example: false
+        type: boolean
+      port:
+        description: service_hrrp_rule 表字段
+        type: integer
+      round_type:
+        description: service_load_balance 表字段
+        example: 0
+        type: integer
+      service_desc:
+        description: 服务描述
+        example: 必填 服务描述
+        type: string
+      service_flow_limit:
+        description: 服务的限流
+        example: 0
+        type: integer
+      service_name:
+        description: service_info 表字段
+        example: 必填 服务名称
+        type: string
+      upstream_connect_timeout:
+        description: 建立连接超时, 单位s
+        example: 0
+        type: integer
+      upstream_header_timeout:
+        description: 获取header超时, 单位s
+        example: 0
+        type: integer
+      upstream_idle_timeout:
+        description: 链接最大空闲时间, 单位s
+        example: 0
+        type: integer
+      upstream_max_idle:
+        description: 最大空闲链接数
+        example: 0
+        type: integer
+      weight_list:
+        description: 权重列表
+        example: "10"
+        type: string
+      white_list:
+        description: 白名单
+        example: ""
+        type: string
+    type: object
+  middleware.ResponseErr:
+    properties:
+      data: {}
+      errmsg:
+        type: string
+      errno:
+        type: integer
+      stack:
+        type: string
+    type: object
 host: 127.0.0.1:2401
 info:
   contact:
@@ -7,6 +643,395 @@ info:
   title: 轻量级网关
   version: "1.0"
 paths:
+  /admin/admin_info:
+    get:
+      consumes:
+      - application/json
+      description: 获取admin信息
+      operationId: /admin/admin_info
+      parameters:
+      - description: Bearer 31a165baebe6dec616b1f8f3207b4273
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: success
+          schema:
+            allOf:
+            - $ref: '#/definitions/middleware.ResponseErr'
+            - properties:
+                data:
+                  $ref: '#/definitions/dto.AdminInfoResponse'
+              type: object
+      security:
+      - ApiKeyAuth: []
+      summary: admin基本信息
+      tags:
+      - adminApi
+  /admin/change_pwd:
+    post:
+      consumes:
+      - application/json
+      description: 修改密码
+      operationId: /admin/change_pwd
+      parameters:
+      - description: Bearer 31a165baebe6dec616b1f8f3207b4273
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: body
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/dto.AdminChangeRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: success
+          schema:
+            type: string
+      security:
+      - ApiKeyAuth: []
+      summary: admin密码修改
+      tags:
+      - adminApi
+  /admin_login/login:
+    post:
+      consumes:
+      - application/json
+      description: 描述
+      operationId: /admin_login/login
+      parameters:
+      - description: body
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/dto.AdminLoginRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: success
+          schema:
+            allOf:
+            - $ref: '#/definitions/middleware.ResponseErr'
+            - properties:
+                data:
+                  $ref: '#/definitions/dto.AdminLoginResponse'
+              type: object
+      summary: admin登录接口
+      tags:
+      - adminApi
+  /app/app_add:
+    post:
+      consumes:
+      - application/json
+      description: 添加用户
+      operationId: /app/app_add
+      parameters:
+      - description: token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: add
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/dto.AppListItem'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: success
+          schema:
+            allOf:
+            - $ref: '#/definitions/middleware.ResponseErr'
+            - properties:
+                data:
+                  type: string
+              type: object
+      security:
+      - ApiKeyAuth: []
+      summary: 添加用户
+      tags:
+      - 用户管理
+  /app/app_delete:
+    get:
+      consumes:
+      - application/json
+      description: 用户删除
+      operationId: /app/app_delete
+      parameters:
+      - description: token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: 关键词
+        in: query
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: success
+          schema:
+            allOf:
+            - $ref: '#/definitions/middleware.ResponseErr'
+            - properties:
+                data:
+                  type: string
+              type: object
+      security:
+      - ApiKeyAuth: []
+      summary: 用户删除
+      tags:
+      - 用户管理
+  /app/app_detail:
+    get:
+      consumes:
+      - application/json
+      description: 用户详情
+      operationId: /app/app_detail
+      parameters:
+      - description: token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: 关键词
+        in: query
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: success
+          schema:
+            allOf:
+            - $ref: '#/definitions/middleware.ResponseErr'
+            - properties:
+                data:
+                  $ref: '#/definitions/dao.App'
+              type: object
+      security:
+      - ApiKeyAuth: []
+      summary: 用户详情
+      tags:
+      - 用户管理
+  /app/app_list:
+    get:
+      consumes:
+      - application/json
+      description: 用户列表
+      operationId: /app/app_list
+      parameters:
+      - description: token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: 查询词汇
+        in: query
+        name: info
+        type: string
+      - description: 页数
+        in: query
+        name: page_no
+        required: true
+        type: integer
+      - description: 条数
+        in: query
+        name: page_size
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: success
+          schema:
+            allOf:
+            - $ref: '#/definitions/middleware.ResponseErr'
+            - properties:
+                data:
+                  $ref: '#/definitions/dto.AppListResponse'
+              type: object
+      security:
+      - ApiKeyAuth: []
+      summary: 用户列表
+      tags:
+      - 用户管理
+  /app/app_stat:
+    get:
+      consumes:
+      - application/json
+      description: 用户统计
+      operationId: /app/app_stat
+      parameters:
+      - description: token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: 关键词
+        in: query
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: success
+          schema:
+            allOf:
+            - $ref: '#/definitions/middleware.ResponseErr'
+            - properties:
+                data:
+                  type: string
+              type: object
+      security:
+      - ApiKeyAuth: []
+      summary: 用户统计
+      tags:
+      - 用户管理
+  /app/app_update:
+    post:
+      consumes:
+      - application/json
+      description: 修改用户
+      operationId: /app/app_update
+      parameters:
+      - description: token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: add
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/dto.AppListItem'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: success
+          schema:
+            allOf:
+            - $ref: '#/definitions/middleware.ResponseErr'
+            - properties:
+                data:
+                  type: string
+              type: object
+      security:
+      - ApiKeyAuth: []
+      summary: 修改用户
+      tags:
+      - 用户管理
+  /dashboard/flowStat:
+    get:
+      consumes:
+      - application/json
+      description: 指标统计
+      operationId: /dashboard/flowStat
+      parameters:
+      - description: token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: success
+          schema:
+            allOf:
+            - $ref: '#/definitions/middleware.ResponseErr'
+            - properties:
+                data:
+                  $ref: '#/definitions/dto.ServiceStatResponse'
+              type: object
+      security:
+      - ApiKeyAuth: []
+      summary: 指标统计
+      tags:
+      - 大盘
+  /dashboard/panelGroupData:
+    get:
+      consumes:
+      - application/json
+      description: 指标统计
+      operationId: /dashboard/panelGroupData
+      parameters:
+      - description: token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: success
+          schema:
+            allOf:
+            - $ref: '#/definitions/middleware.ResponseErr'
+            - properties:
+                data:
+                  $ref: '#/definitions/dto.PanelGroupDataResponse'
+              type: object
+      security:
+      - ApiKeyAuth: []
+      summary: 指标统计
+      tags:
+      - 大盘
+  /dashboard/service_stat:
+    get:
+      consumes:
+      - application/json
+      description: 指标统计
+      operationId: /dashboard/service_stat
+      parameters:
+      - description: token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: success
+          schema:
+            allOf:
+            - $ref: '#/definitions/middleware.ResponseErr'
+            - properties:
+                data:
+                  $ref: '#/definitions/dto.ServiceStatAllResponse'
+              type: object
+      security:
+      - ApiKeyAuth: []
+      summary: 指标统计
+      tags:
+      - 大盘
   /ping:
     get:
       description: 检测接口
@@ -17,6 +1042,361 @@ paths:
             type: string
       tags:
       - api-v1
+  /service/service_add_grpc:
+    post:
+      consumes:
+      - application/json
+      description: 添加hGrpc服务
+      operationId: /service/service_add_grpc
+      parameters:
+      - description: token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: add
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/dto.ServiceAddGrpcRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: success
+          schema:
+            allOf:
+            - $ref: '#/definitions/middleware.ResponseErr'
+            - properties:
+                data:
+                  type: string
+              type: object
+      security:
+      - ApiKeyAuth: []
+      summary: 添加hGrpc服务
+      tags:
+      - 服务管理
+  /service/service_add_http:
+    post:
+      consumes:
+      - application/json
+      description: 添加http服务
+      operationId: /service/service_add_http
+      parameters:
+      - description: token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: add
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/dto.ServiceAddHttpRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: success
+          schema:
+            allOf:
+            - $ref: '#/definitions/middleware.ResponseErr'
+            - properties:
+                data:
+                  type: string
+              type: object
+      security:
+      - ApiKeyAuth: []
+      summary: 添加http服务
+      tags:
+      - 服务管理
+  /service/service_add_tcp:
+    post:
+      consumes:
+      - application/json
+      description: 添加tcp服务
+      operationId: /service/service_add_tcp
+      parameters:
+      - description: token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: add
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/dto.ServiceAddTcpRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: success
+          schema:
+            allOf:
+            - $ref: '#/definitions/middleware.ResponseErr'
+            - properties:
+                data:
+                  type: string
+              type: object
+      security:
+      - ApiKeyAuth: []
+      summary: 添加tcp服务
+      tags:
+      - 服务管理
+  /service/service_delete:
+    get:
+      consumes:
+      - application/json
+      description: 服务删除
+      operationId: /service/service_delete
+      parameters:
+      - description: token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: 关键词
+        in: query
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: success
+          schema:
+            allOf:
+            - $ref: '#/definitions/middleware.ResponseErr'
+            - properties:
+                data:
+                  type: string
+              type: object
+      security:
+      - ApiKeyAuth: []
+      summary: 服务删除
+      tags:
+      - 服务管理
+  /service/service_detail:
+    get:
+      consumes:
+      - application/json
+      description: 服务详情
+      operationId: /service/service_detail
+      parameters:
+      - description: token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: 关键词
+        in: query
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: success
+          schema:
+            allOf:
+            - $ref: '#/definitions/middleware.ResponseErr'
+            - properties:
+                data:
+                  $ref: '#/definitions/dto.ServiceUpdateGrpcRequest'
+              type: object
+      security:
+      - ApiKeyAuth: []
+      summary: 服务详情
+      tags:
+      - 服务管理
+  /service/service_list:
+    get:
+      consumes:
+      - application/json
+      description: 服务列表
+      operationId: /service/service_list
+      parameters:
+      - description: token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: 关键词
+        in: query
+        name: info
+        type: string
+      - description: 页数
+        in: query
+        name: page_no
+        required: true
+        type: integer
+      - description: 个数
+        in: query
+        name: page_size
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: success
+          schema:
+            allOf:
+            - $ref: '#/definitions/middleware.ResponseErr'
+            - properties:
+                data:
+                  $ref: '#/definitions/dto.ServiceListResponse'
+              type: object
+      security:
+      - ApiKeyAuth: []
+      summary: 服务列表
+      tags:
+      - 服务管理
+  /service/service_stat:
+    get:
+      consumes:
+      - application/json
+      description: 服务统计
+      operationId: /service/service_stat
+      parameters:
+      - description: token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: 关键词
+        in: query
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: success
+          schema:
+            allOf:
+            - $ref: '#/definitions/middleware.ResponseErr'
+            - properties:
+                data:
+                  $ref: '#/definitions/dto.ServiceStatResponse'
+              type: object
+      security:
+      - ApiKeyAuth: []
+      summary: 服务统计
+      tags:
+      - 服务管理
+  /service/service_update_grpc:
+    post:
+      consumes:
+      - application/json
+      description: 修改tcp服务
+      operationId: /service/service_update_grpc
+      parameters:
+      - description: token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: update
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/dto.ServiceUpdateGrpcRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: success
+          schema:
+            allOf:
+            - $ref: '#/definitions/middleware.ResponseErr'
+            - properties:
+                data:
+                  type: string
+              type: object
+      security:
+      - ApiKeyAuth: []
+      summary: 修改grpc服务
+      tags:
+      - 服务管理
+  /service/service_update_http:
+    post:
+      consumes:
+      - application/json
+      description: 修改http服务
+      operationId: /service/service_update_http
+      parameters:
+      - description: token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: update
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/dto.ServiceUpdateHttpRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: success
+          schema:
+            allOf:
+            - $ref: '#/definitions/middleware.ResponseErr'
+            - properties:
+                data:
+                  type: string
+              type: object
+      security:
+      - ApiKeyAuth: []
+      summary: 修改http服务
+      tags:
+      - 服务管理
+  /service/service_update_tcp:
+    post:
+      consumes:
+      - application/json
+      description: 修改tcp服务
+      operationId: /service/service_update_tcp
+      parameters:
+      - description: token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: update
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/dto.ServiceUpdateTcpRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: success
+          schema:
+            allOf:
+            - $ref: '#/definitions/middleware.ResponseErr'
+            - properties:
+                data:
+                  type: string
+              type: object
+      security:
+      - ApiKeyAuth: []
+      summary: 修改tcp服务
+      tags:
+      - 服务管理
 schemes:
 - http
 swagger: "2.0"

@@ -22,7 +22,7 @@ type ServiceInfo struct {
 }
 
 func (m *ServiceInfo) Find() (err error) {
-	b, err := DBEngine.Get(m)
+	b, err := GetDBDriver().Get(m)
 	if err != nil {
 		return err
 	}
@@ -35,7 +35,7 @@ func (m *ServiceInfo) Find() (err error) {
 // 获取 []ServiceInfo
 func (s *ServiceInfo) PageList(param *dto.ServiceListRequest) (list []ServiceInfo, totle uint64, err error) {
 	list = []ServiceInfo{}
-	query := DBEngine.NewSession()
+	query := GetDBDriver().NewSession()
 	defer query.Close()
 	// 如果 info 存在则进行模糊匹配
 	if param.Info != "" {
@@ -48,7 +48,7 @@ func (s *ServiceInfo) PageList(param *dto.ServiceListRequest) (list []ServiceInf
 
 // 删除操作，需要初始化 id
 func (s *ServiceInfo) Delete() error {
-	i, err := DBEngine.ID(s.Id).Delete(s)
+	i, err := GetDBDriver().ID(s.Id).Delete(s)
 	if i < 1 {
 		return errors.New("删除失败，无此记录")
 	}
@@ -57,7 +57,7 @@ func (s *ServiceInfo) Delete() error {
 
 // 以自身为条件，判断是否存在
 func (s *ServiceInfo) Exist(tag string) error {
-	ok, err := DBEngine.Exist(s)
+	ok, err := GetDBDriver().Exist(s)
 	if ok {
 		return errors.New(tag + "已存在" + public.EndMark)
 	}
@@ -69,7 +69,7 @@ func (s *ServiceInfo) GetId() uint64 {
 }
 
 func (s *ServiceInfo) GetTatle() (int64, error) {
-	i, err := DBEngine.Count(s)
+	i, err := GetDBDriver().Count(s)
 	if err != nil {
 		return 0, err
 	}
@@ -79,7 +79,7 @@ func (s *ServiceInfo) GetTatle() (int64, error) {
 func (s *ServiceInfo) GroupByLoadType() ([]dto.ServiceStatAllItemResponse, error) {
 	statList := []dto.ServiceStatAllItemResponse{}
 	for index, name := range public.LoadTypeSlice {
-		value, err := DBEngine.Cols("load_type").Where("load_type = ?", index).Count(s)
+		value, err := GetDBDriver().Cols("load_type").Where("load_type = ?", index).Count(s)
 		if err != nil {
 			return nil, err
 		}

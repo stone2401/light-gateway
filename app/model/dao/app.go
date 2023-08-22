@@ -24,7 +24,7 @@ type App struct {
 }
 
 func (m *App) Find() (err error) {
-	b, err := DBEngine.Get(m)
+	b, err := GetDBDriver().Get(m)
 	if err != nil {
 		return err
 	}
@@ -36,7 +36,7 @@ func (m *App) Find() (err error) {
 
 // 以自身为条件，判断是否存在
 func (m *App) Exist(tag string) error {
-	ok, err := DBEngine.Exist(m)
+	ok, err := GetDBDriver().Exist(m)
 	if ok {
 		return errors.New(tag + "已存在" + public.EndMark)
 	}
@@ -45,7 +45,7 @@ func (m *App) Exist(tag string) error {
 
 func (a *App) PageList(param *dto.ServiceListRequest) (list []App, totle uint64, err error) {
 	list = []App{}
-	query := DBEngine.NewSession()
+	query := GetDBDriver().NewSession()
 	defer query.Close()
 	if param.Info != "" {
 		query = query.Where("app_id like ?", "%"+param.Info+"%").Or("name like ?", "%"+param.Info+"%")
@@ -55,7 +55,7 @@ func (a *App) PageList(param *dto.ServiceListRequest) (list []App, totle uint64,
 }
 
 func (a *App) Delete() error {
-	i, err := DBEngine.ID(a.Id).Delete(a)
+	i, err := GetDBDriver().ID(a.Id).Delete(a)
 	if i < 1 {
 		return errors.New("删除失败，无此记录")
 	}
@@ -63,7 +63,7 @@ func (a *App) Delete() error {
 }
 
 func (a *App) Save() error {
-	i, err := DBEngine.Insert(a)
+	i, err := GetDBDriver().Insert(a)
 	if i < 1 {
 		return errors.New("数据存入失败")
 	}
@@ -71,7 +71,7 @@ func (a *App) Save() error {
 }
 
 func (a *App) Update() error {
-	i, err := DBEngine.ID(a.Id).AllCols().Update(a)
+	i, err := GetDBDriver().ID(a.Id).AllCols().Update(a)
 	if i < 1 {
 		return errors.New("数据写入失败")
 	}
@@ -79,7 +79,7 @@ func (a *App) Update() error {
 }
 
 func (a *App) GetTatle() (int64, error) {
-	i, err := DBEngine.Count(a)
+	i, err := GetDBDriver().Count(a)
 	if err != nil {
 		return 0, err
 	}

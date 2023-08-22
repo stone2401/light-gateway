@@ -37,10 +37,6 @@ type TestRule struct {
 	Age  string `rule:"notnull" label:"年龄" regexp:"email"`
 }
 
-// func (t *TestRule) Check(builder *strings.Builder) {
-// 	fmt.Println("被调用了")
-// }
-
 func Authenticator(ctx *gin.Context, params any) (err error) {
 	if err := ctx.ShouldBind(params); err != nil {
 		log.Panicln(err)

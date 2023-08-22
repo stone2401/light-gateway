@@ -2,6 +2,7 @@ package dao
 
 import (
 	"log"
+	"sync"
 	"time"
 
 	_ "github.com/go-sql-driver/mysql"
@@ -12,7 +13,8 @@ import (
 	"xorm.io/xorm/names"
 )
 
-var DBEngine *xorm.Engine
+var engine *xorm.Engine
+var sonce sync.Once
 
 // 要被初始化的 dao
 var syncDao = []any{&Admin{}, &App{}, &ServiceAccessControl{}, &ServiceInfo{},
@@ -26,35 +28,47 @@ var initFunc = []func(){initAdmin, initApp, initServiceAccessControl,
 }
 
 func init() {
-	var err error
-	DBEngine, err = xorm.NewEngine(config.Config.DriverName, config.Config.GetDatabaseConfig())
-	if err != nil {
-		log.Println("[!] 数据库连接失败：", err)
-	}
-	if err2 := DBEngine.Ping(); err2 != nil {
-		log.Println("[!] 数据库 ping 失败", err2)
-	}
-	// 最大连接数设置
-	DBEngine.SetMaxOpenConns(30)
-	DBEngine.SetMaxIdleConns(10)
-	DBEngine.SetConnMaxLifetime(30 * time.Minute)
-	// 日志打印设置
-	DBEngine.SetLogger(xormLog.NewSimpleLogger(config.GenLogFilename("xorm")))
-	DBEngine.Logger().SetLevel(xormLog.LOG_DEBUG)
-	// 设置前缀
-	tbMapper := names.NewPrefixMapper(names.SnakeMapper{}, "gateway_")
-	DBEngine.SetTableMapper(tbMapper)
 	// 同步表
-	SyncTable()
-	for _, funcItem := range initFunc {
-		funcItem()
-	}
-	DBEngine.Logger().ShowSQL(config.Mode)
+	go func() {
+		// 最大连接数设置
+		GetDBDriver().SetMaxOpenConns(30)
+		GetDBDriver().SetMaxIdleConns(10)
+		GetDBDriver().SetConnMaxLifetime(30 * time.Minute)
+		// 日志打印设置
+		GetDBDriver().SetLogger(xormLog.NewSimpleLogger(config.GenLogFilename("xorm")))
+		GetDBDriver().Logger().SetLevel(xormLog.LOG_DEBUG)
+		// 设置前缀
+		tbMapper := names.NewPrefixMapper(names.SnakeMapper{}, "gateway_")
+		GetDBDriver().SetTableMapper(tbMapper)
+		SyncTable()
+		for _, funcItem := range initFunc {
+			funcItem()
+		}
+		if config.Mode {
+			GetDBDriver().Logger().ShowSQL(config.Mode)
+		}
+	}()
+}
+
+// xorm Engine 单例
+func GetDBDriver() *xorm.Engine {
+	// 只执行一次，切确保线程安全
+	sonce.Do(func() {
+		var err error
+		engine, err = xorm.NewEngine(config.Config.DriverName, config.Config.GetDatabaseConfig())
+		if err != nil {
+			log.Println("[!] 数据库连接失败：", err)
+		}
+		if err2 := engine.Ping(); err2 != nil {
+			log.Println("[!] 数据库 ping 失败", err2)
+		}
+	})
+	return engine
 }
 
 // 同步表结构
 func SyncTable() {
-	err := DBEngine.Sync2(syncDao...)
+	err := GetDBDriver().Sync2(syncDao...)
 	if err != nil {
 		log.Panicln("[i] 数据库表初始化失败: ", err)
 	}
@@ -150,7 +164,7 @@ func initServiceInfo() {
 	for _, serviceInfo := range serviceInfos {
 		insertTable("serviceInfo", &serviceInfo)
 		if serviceInfo.IsDelete == 1 && serviceInfo.DeleteAt.IsZero() {
-			DBEngine.Delete(&serviceInfo)
+			GetDBDriver().Delete(&serviceInfo)
 		}
 	}
 }
@@ -239,13 +253,13 @@ func initServiceTcpRule() {
 
 // 初始化用到的函数
 func insertTable(table string, data interface{}) {
-	ok, err := DBEngine.Get(data)
+	ok, err := GetDBDriver().Get(data)
 	if err != nil {
 		log.Panicf("[!] 初始化数据表失败 %s 表: %s\n", table, err)
 	}
-	ok2, _ := DBEngine.Unscoped().Get(data)
+	ok2, _ := GetDBDriver().Unscoped().Get(data)
 	if !ok && !ok2 {
-		i, err2 := DBEngine.Insert(data)
+		i, err2 := GetDBDriver().Insert(data)
 		if err2 != nil {
 			log.Panicf("[!] 初始化数据失败 %s 表: %s\n", table, err2)
 		}

@@ -13,7 +13,7 @@ type ServiceInterface interface {
 // 事务的方式存入多个数据库表
 func TransactionSaveServiceAll(serviceAddHttpRequest any, loadType int) error {
 	// 注：要先调session.Begin()，最后要调session.Commit(),Rollback()一般可以不用调，调用session.Close的时候，如果没调过session.Commit()，则Rollback()会被自动调。
-	session := DBEngine.NewSession()
+	session := GetDBDriver().NewSession()
 	defer session.Close()
 	//	添加一个开始
 	if err := session.Begin(); err != nil {
@@ -68,7 +68,7 @@ func TransactionSaveServiceAll(serviceAddHttpRequest any, loadType int) error {
 // 更新http数据
 // func TransactionUpdateHttp(serviceUpdateHttp *dto.ServiceUpdateHttpRequest) error {
 // 	// 注：要先调session.Begin()，最后要调session.Commit(),Rollback()一般可以不用调，调用session.Close的时候，如果没调过session.Commit()，则Rollback()会被自动调。
-// 	session := DBEngine.NewSession()
+// 	session := GetDBDriver().NewSession()
 // 	defer session.Close()
 // 	//	添加一个开始
 // 	if err := session.Begin(); err != nil {
@@ -120,7 +120,7 @@ func TransactionUpdateAll(id uint64, serviceUpdate any) error {
 	case public.LoadTypeGrpc:
 		listService = append(listService, serviceDetail.GrpcRule)
 	}
-	session := DBEngine.NewSession()
+	session := GetDBDriver().NewSession()
 	defer session.Close()
 	//	添加一个开始
 	if err := session.Begin(); err != nil {

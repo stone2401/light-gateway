@@ -16,7 +16,7 @@ const (
 )
 
 type Balance interface {
-	Get() (string, error)
+	Get(string) (string, error)
 	Add(params ...string) error
 	Delete(params ...string)
 }
@@ -62,7 +62,7 @@ func Watch(ctx context.Context, balance Balance, suffix string) error {
 	pub := GetRedis().PSubscribe(channels)
 	defer pub.Close()
 	for {
-		log.Println(balance.Get())
+		log.Println(balance.Get("hello"))
 		select {
 		case <-ctx.Done():
 			return nil

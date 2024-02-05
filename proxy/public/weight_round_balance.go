@@ -19,7 +19,7 @@ type WeightNode struct {
 	effectiveWeight int // 有效权重
 }
 
-func (w *WeightRoundBalance) Get() (string, error) {
+func (w *WeightRoundBalance) Get(params string) (string, error) {
 	total := 0
 	var best *WeightNode
 	for _, value := range w.rss {

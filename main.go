@@ -1,7 +1,9 @@
 package main
 
 import (
+	"fmt"
 	"io"
+	"syscall"
 
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
@@ -24,5 +26,7 @@ func main() {
 	{
 		v2.RegisterRouterV2(RouterV2)
 	}
-	app.Run(":2401")
+	go app.Run(":2401")
+	si := make([]syscall.Signal, 1)
+	fmt.Println(si)
 }

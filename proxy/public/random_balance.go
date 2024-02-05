@@ -12,7 +12,15 @@ type RandomBalance struct {
 	mx     sync.RWMutex
 }
 
-func (r *RandomBalance) Get() (string, error) {
+func NewRandomBalance() *RandomBalance {
+	return &RandomBalance{
+		length: 0,
+		rss:    []string{},
+		mx:     sync.RWMutex{},
+	}
+}
+
+func (r *RandomBalance) Get(params string) (string, error) {
 	r.mx.RLock()
 	defer r.mx.RUnlock()
 	if len(r.rss) == 0 {

@@ -11,7 +11,7 @@ type RoundRobinBalance struct {
 	mx       sync.RWMutex
 }
 
-func (r *RoundRobinBalance) Get() (string, error) {
+func (r *RoundRobinBalance) Get(params string) (string, error) {
 	if len(r.rss) == 0 {
 		return "", errors.New("rss is empty")
 	}

@@ -16,10 +16,7 @@ type HttpProxy struct {
 func NewReverseProxy(balance public.Balance) *httputil.ReverseProxy {
 	// 请求打过来之后实际调用的方法
 	director := func(req *http.Request) {
-		log.Println("收到请求")
-		log.Println()
-		uri, _ := balance.Get()
-		return
+		uri, _ := balance.Get(strings.Join(req.Response.Header["X-Real-Uri"], ","))
 		target, err2 := url.Parse(uri)
 		if err2 != nil {
 			log.Println(err2)
@@ -29,6 +26,7 @@ func NewReverseProxy(balance public.Balance) *httputil.ReverseProxy {
 	return &httputil.ReverseProxy{Director: director}
 }
 
+// 下面都是在拼网址
 func rewriteRequestURL(req *http.Request, target *url.URL) {
 	targetQuery := target.RawQuery
 	req.URL.Scheme = target.Scheme

@@ -24,7 +24,7 @@ const (
 func GetRedis() *redisClient {
 	once.Do(func() {
 		rc = &redisClient{
-			rdb: redis.NewClient(&redis.Options{Password: "123456123", DB: 0}),
+			rdb: redis.NewClient(&redis.Options{Password: "!Shizhenfei123", DB: 0}),
 		}
 	})
 	return rc

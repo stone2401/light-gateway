@@ -2,6 +2,8 @@ package dao
 
 import (
 	"testing"
+
+	"github.com/stone2401/light-gateway/app/tools/db"
 )
 
 func TestServiceInfo_PageList(t *testing.T) {
@@ -16,6 +18,6 @@ func TestServiceInfo_PageList(t *testing.T) {
 
 func TestUpdate(t *testing.T) {
 	param := &ServiceInfo{Id: 61}
-	i, err := GetDBDriver().ID(param.Id).Unscoped().Cols("delete_at").Update(param)
+	i, err := db.GetDBDriver().ID(param.Id).Unscoped().Cols("delete_at").Update(param)
 	t.Logf("恢复条数:%d 错误日志:%+v, params: %+v", i, err, param)
 }

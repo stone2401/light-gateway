@@ -15,15 +15,15 @@ var Config *Configs
 var Mode bool = true
 var pwd string
 
-func init() {
+func Init() {
 	// 读取 配置文件
-	s := os.Args
 	var b []byte
 	_, filename, _, _ := runtime.Caller(0)
 	pwd = path.Dir(filename)
-	if len(s) == 1 || s[1] == "dev" {
+	s := os.Getenv("GIN_MODE")
+	if s == "dev" {
 		readConfigFile(&b, pwd, "../conf/config.dev.yaml")
-	} else if s[1] == "prod" {
+	} else if s == "prod" {
 		Mode = false
 		readConfigFile(&b, pwd, "../conf/config.prod.yaml")
 	} else {
@@ -50,7 +50,7 @@ func readConfigFile(b *[]byte, pwd string, file string) {
 // config 结构体
 type Configs struct {
 	Mysql      `yaml:"Mysql"`
-	Zookeeper  `yaml:"Zookeeper"`
+	Redis      `yaml:"Redis"`
 	JWT        `yaml:"Jwt"`
 	Cluster    `yaml:"Cluster"`
 	DriverName string `yaml:"DriverName"`
@@ -65,9 +65,11 @@ type Mysql struct {
 	Database string `yaml:"database"`
 }
 
-// zookeeper 配置结构体
-type Zookeeper struct {
-	Addrs []string `yaml:"Addrs"`
+type Redis struct {
+	Host     string `yaml:"host"`
+	Port     int    `yaml:"port"`
+	Password string `yaml:"password"`
+	Database int    `yaml:"database"`
 }
 
 // JWT 认证配置
@@ -88,6 +90,11 @@ func (m *Mysql) GetDatabaseConfig() string {
 	return fmt.Sprintf("%s:%s@(%s:%d)/%s?charset=utf8",
 		m.Username, m.Password, m.Host, m.Port, m.Database,
 	)
+}
+
+// 获取 redis uri
+func (r *Redis) GetRedisConfig() string {
+	return fmt.Sprintf("%s:%d", r.Host, r.Port)
 }
 
 func GenLogFilename(class string) (logfile *os.File) {

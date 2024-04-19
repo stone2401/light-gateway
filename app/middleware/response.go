@@ -10,24 +10,24 @@ import (
 )
 
 type ResponseErr struct {
-	ErrorCode int         `json:"errno"`
-	ErrorMsg  string      `json:"errmsg"`
-	Data      interface{} `json:"data"`
-	Stack     string      `json:"stack"`
+	Message string      `json:"message"`
+	Data    interface{} `json:"data"`
+	Stack   string      `json:"stack"`
+	Code    int         `json:"code"`
 }
 
 func ResponseError(ctx *gin.Context, code int, err error) {
 	var resp *ResponseErr
 	if config.Mode {
-		resp = &ResponseErr{ErrorCode: code, ErrorMsg: err.Error(), Stack: string(debug.Stack())}
+		resp = &ResponseErr{Code: code, Message: err.Error(), Stack: string(debug.Stack())}
 	} else {
-		resp = &ResponseErr{ErrorCode: code, ErrorMsg: err.Error()}
+		resp = &ResponseErr{Code: code, Message: err.Error()}
 	}
 	log.Println(resp)
 	ctx.JSON(http.StatusOK, resp)
 }
 
 func ResponseSuccess(ctx *gin.Context, data any) {
-	resp := &ResponseErr{ErrorCode: 0, Data: data}
+	resp := &ResponseErr{Data: data, Code: 200, Message: "success"}
 	ctx.JSON(http.StatusOK, resp)
 }

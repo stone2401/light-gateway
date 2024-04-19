@@ -11,7 +11,7 @@
         },
         "version": "1.0"
     },
-    "host": "127.0.0.1:2401",
+    "host": "localhost:2401",
     "basePath": "/api/v1",
     "paths": {
         "/admin/admin_info": {
@@ -508,6 +508,50 @@
                                     "properties": {
                                         "data": {
                                             "type": "string"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
+        },
+        "/auth/captcha": {
+            "get": {
+                "description": "验证码接口",
+                "tags": [
+                    "adminApi"
+                ],
+                "summary": "captcha 验证码",
+                "operationId": "/auth/captcha",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "宽度",
+                        "name": "width",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "高度",
+                        "name": "height",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "success",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/middleware.ResponseErr"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/dto.AuthcaptchaResp"
                                         }
                                     }
                                 }
@@ -1277,6 +1321,44 @@
                     }
                 }
             }
+        },
+        "/system/menus": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "menu 列表",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "system"
+                ],
+                "summary": "menu 列表",
+                "operationId": "/system/menu",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "token",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "success",
+                        "schema": {
+                            "$ref": "#/definitions/middleware.ResponseErr"
+                        }
+                    }
+                }
+            }
         }
     },
     "definitions": {
@@ -1335,16 +1417,25 @@
                 "avatar": {
                     "type": "string"
                 },
+                "email": {
+                    "type": "string"
+                },
                 "id": {
                     "type": "integer"
                 },
-                "introduction": {
-                    "type": "string"
-                },
-                "login_time": {
+                "loginTime": {
                     "type": "string"
                 },
                 "name": {
+                    "type": "string"
+                },
+                "nickname": {
+                    "type": "string"
+                },
+                "phone": {
+                    "type": "string"
+                },
+                "remark": {
                     "type": "string"
                 },
                 "roles": {
@@ -1358,6 +1449,10 @@
         "dto.AdminLoginRequest": {
             "type": "object",
             "properties": {
+                "captchaId": {
+                    "type": "string",
+                    "example": "captchaa_id"
+                },
                 "password": {
                     "type": "string",
                     "example": "admin"
@@ -1365,6 +1460,10 @@
                 "username": {
                     "type": "string",
                     "example": "admin"
+                },
+                "verifyCode": {
+                    "type": "string",
+                    "example": "1234"
                 }
             }
         },
@@ -1419,6 +1518,17 @@
                 },
                 "total": {
                     "type": "integer"
+                }
+            }
+        },
+        "dto.AuthcaptchaResp": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "string"
+                },
+                "img": {
+                    "type": "string"
                 }
             }
         },
@@ -2115,12 +2225,12 @@
         "middleware.ResponseErr": {
             "type": "object",
             "properties": {
-                "data": {},
-                "errmsg": {
-                    "type": "string"
-                },
-                "errno": {
+                "code": {
                     "type": "integer"
+                },
+                "data": {},
+                "message": {
+                    "type": "string"
                 },
                 "stack": {
                     "type": "string"

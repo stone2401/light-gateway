@@ -7,6 +7,7 @@ import (
 
 	"github.com/stone2401/light-gateway/app/model/dto"
 	"github.com/stone2401/light-gateway/app/public"
+	"github.com/stone2401/light-gateway/app/tools/db"
 )
 
 // 网关基本信息表，所有操作通过 Id  字段进行，必须初始化
@@ -22,7 +23,7 @@ type ServiceInfo struct {
 }
 
 func (m *ServiceInfo) Find() (err error) {
-	b, err := GetDBDriver().Get(m)
+	b, err := db.GetDBDriver().Get(m)
 	if err != nil {
 		return err
 	}
@@ -35,7 +36,7 @@ func (m *ServiceInfo) Find() (err error) {
 // 获取 []ServiceInfo
 func (s *ServiceInfo) PageList(param *dto.ServiceListRequest) (list []ServiceInfo, totle uint64, err error) {
 	list = []ServiceInfo{}
-	query := GetDBDriver().NewSession()
+	query := db.GetDBDriver().NewSession()
 	defer query.Close()
 	// 如果 info 存在则进行模糊匹配
 	if param.Info != "" {
@@ -48,7 +49,7 @@ func (s *ServiceInfo) PageList(param *dto.ServiceListRequest) (list []ServiceInf
 
 // 删除操作，需要初始化 id
 func (s *ServiceInfo) Delete() error {
-	i, err := GetDBDriver().ID(s.Id).Delete(s)
+	i, err := db.GetDBDriver().ID(s.Id).Delete(s)
 	if i < 1 {
 		return errors.New("删除失败，无此记录")
 	}
@@ -57,7 +58,7 @@ func (s *ServiceInfo) Delete() error {
 
 // 以自身为条件，判断是否存在
 func (s *ServiceInfo) Exist(tag string) error {
-	ok, err := GetDBDriver().Exist(s)
+	ok, err := db.GetDBDriver().Exist(s)
 	if ok {
 		return errors.New(tag + "已存在" + public.EndMark)
 	}
@@ -69,7 +70,7 @@ func (s *ServiceInfo) GetId() uint64 {
 }
 
 func (s *ServiceInfo) GetTatle() (int64, error) {
-	i, err := GetDBDriver().Count(s)
+	i, err := db.GetDBDriver().Count(s)
 	if err != nil {
 		return 0, err
 	}
@@ -79,7 +80,7 @@ func (s *ServiceInfo) GetTatle() (int64, error) {
 func (s *ServiceInfo) GroupByLoadType() ([]dto.ServiceStatAllItemResponse, error) {
 	statList := []dto.ServiceStatAllItemResponse{}
 	for index, name := range public.LoadTypeSlice {
-		value, err := GetDBDriver().Cols("load_type").Where("load_type = ?", index).Count(s)
+		value, err := db.GetDBDriver().Cols("load_type").Where("load_type = ?", index).Count(s)
 		if err != nil {
 			return nil, err
 		}

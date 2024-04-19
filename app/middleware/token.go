@@ -15,10 +15,11 @@ func TokenMiddleware() gin.HandlerFunc {
 			ctx.Abort()
 			return
 		}
+		token = token[7:]
 		c, err := public.ParseToken(token)
 		ctx.Set("token", c)
 		if err != nil {
-			ResponseError(ctx, 2002, err)
+			ResponseError(ctx, 1101, err)
 			ctx.Abort()
 			return
 		}

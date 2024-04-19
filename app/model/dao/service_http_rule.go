@@ -4,6 +4,7 @@ import (
 	"github.com/pkg/errors"
 
 	"github.com/stone2401/light-gateway/app/public"
+	"github.com/stone2401/light-gateway/app/tools/db"
 )
 
 // http网关路由匹配表，所有操作通过 ServiceId 字段进行，必须初始化
@@ -20,7 +21,7 @@ type ServiceHttpRule struct {
 }
 
 func (m *ServiceHttpRule) Find() (err error) {
-	b, err := GetDBDriver().Get(m)
+	b, err := db.GetDBDriver().Get(m)
 	if err != nil {
 		return err
 	}
@@ -32,7 +33,7 @@ func (m *ServiceHttpRule) Find() (err error) {
 
 // 以自身为条件，判断是否存在
 func (m *ServiceHttpRule) Exist(tag string) error {
-	ok, err := GetDBDriver().Exist(m)
+	ok, err := db.GetDBDriver().Exist(m)
 	if ok {
 		return errors.New(tag + "已存在" + public.EndMark)
 	}

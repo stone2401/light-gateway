@@ -6,12 +6,14 @@ services:
         hostname: develop-mysql
         container_name: mysql
         environment:
+            MYSQL_DATABASE: go_gateway
             MYSQL_ROOT_PASSWORD: 123456123
             TZ: Asia/Shanghai
         ports:
             - 3306:3306
         volumes:
-            - /home/stone2401/data/mysql:/var/lib/mysql
+            - ./data/mysql-files:/var/lib/mysql-files
+            - ./data/mysql:/var/lib/mysql
             - ./conf/mysql/my.cnf:/etc/mysql/my.cnf
         command: --max_connections=1000 --character-set-server=utf8mb4 --collation-server=utf8mb4_general_ci --default-authentication-plugin=mysql_native_password
     redis:
@@ -22,7 +24,7 @@ services:
         ports:
             - 6379:6379
         volumes:
-            - /home/stone2401/data/redis:/data
+            - ./data/redis:/data
             - ./conf/redis/redis.conf:/usr/local/etc/redis/redis.conf
 
 # auth !Shizhenfei123

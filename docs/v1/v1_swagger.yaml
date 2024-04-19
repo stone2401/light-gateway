@@ -36,13 +36,19 @@ definitions:
     properties:
       avatar:
         type: string
+      email:
+        type: string
       id:
         type: integer
-      introduction:
-        type: string
-      login_time:
+      loginTime:
         type: string
       name:
+        type: string
+      nickname:
+        type: string
+      phone:
+        type: string
+      remark:
         type: string
       roles:
         items:
@@ -51,11 +57,17 @@ definitions:
     type: object
   dto.AdminLoginRequest:
     properties:
+      captchaId:
+        example: captchaa_id
+        type: string
       password:
         example: admin
         type: string
       username:
         example: admin
+        type: string
+      verifyCode:
+        example: "1234"
         type: string
     type: object
   dto.AdminLoginResponse:
@@ -92,6 +104,13 @@ definitions:
         type: array
       total:
         type: integer
+    type: object
+  dto.AuthcaptchaResp:
+    properties:
+      id:
+        type: string
+      img:
+        type: string
     type: object
   dto.PanelGroupDataResponse:
     properties:
@@ -627,15 +646,15 @@ definitions:
     type: object
   middleware.ResponseErr:
     properties:
-      data: {}
-      errmsg:
-        type: string
-      errno:
+      code:
         type: integer
+      data: {}
+      message:
+        type: string
       stack:
         type: string
     type: object
-host: 127.0.0.1:2401
+host: localhost:2401
 info:
   contact:
     email: stone2401@qq.com
@@ -945,6 +964,32 @@ paths:
       summary: 修改用户
       tags:
       - 用户管理
+  /auth/captcha:
+    get:
+      description: 验证码接口
+      operationId: /auth/captcha
+      parameters:
+      - description: 宽度
+        in: query
+        name: width
+        type: string
+      - description: 高度
+        in: query
+        name: height
+        type: string
+      responses:
+        "200":
+          description: success
+          schema:
+            allOf:
+            - $ref: '#/definitions/middleware.ResponseErr'
+            - properties:
+                data:
+                  $ref: '#/definitions/dto.AuthcaptchaResp'
+              type: object
+      summary: captcha 验证码
+      tags:
+      - adminApi
   /dashboard/flowStat:
     get:
       consumes:
@@ -1397,6 +1442,30 @@ paths:
       summary: 修改tcp服务
       tags:
       - 服务管理
+  /system/menus:
+    get:
+      consumes:
+      - application/json
+      description: menu 列表
+      operationId: /system/menu
+      parameters:
+      - description: token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: success
+          schema:
+            $ref: '#/definitions/middleware.ResponseErr'
+      security:
+      - ApiKeyAuth: []
+      summary: menu 列表
+      tags:
+      - system
 schemes:
 - http
 swagger: "2.0"

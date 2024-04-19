@@ -8,6 +8,8 @@ const (
 	HTTPRuleTypePrefixURL = 0
 	HTTPRuleTypeDomainURL = 1
 	EndMark               = "。"
+	CAPTCHAKEY            = "captcha"
+	CAPTCHALEN            = 5
 )
 
 var (

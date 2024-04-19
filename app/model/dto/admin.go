@@ -1,14 +1,15 @@
 package dto
 
-import "time"
-
 type AdminInfoResponse struct {
-	ID           int       `json:"id"`
-	Name         string    `json:"name"`
-	LoginTime    time.Time `json:"login_time"`
-	Avatar       string    `json:"avatar"`
-	Introduction string    `json:"introduction"`
-	Roles        []string  `json:"roles"`
+	ID        int      `json:"id"`
+	Name      string   `json:"name"`
+	LoginTime string   `json:"loginTime"`
+	Avatar    string   `json:"avatar"`
+	Remark    string   `json:"remark"`
+	Roles     []string `json:"roles"`
+	Nickname  string   `json:"nickname"`
+	Email     string   `json:"email"`
+	Phone     string   `json:"phone"`
 }
 
 type AdminChangeRequest struct {

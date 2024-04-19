@@ -7,6 +7,7 @@ import (
 
 	"github.com/stone2401/light-gateway/app/model/dto"
 	"github.com/stone2401/light-gateway/app/public"
+	"github.com/stone2401/light-gateway/app/tools/db"
 )
 
 // 管理员表
@@ -39,12 +40,12 @@ func (a *Admin) LoginCheck(param *dto.AdminLoginRequest) error {
 
 // 以自身为条件，以参数为更新
 func (a *Admin) Update(newAdmin *Admin) error {
-	_, err := GetDBDriver().ID(a.Id).Update(newAdmin)
+	_, err := db.GetDBDriver().ID(a.Id).Update(newAdmin)
 	return err
 }
 
 func (m *Admin) Find() (err error) {
-	b, err := GetDBDriver().Get(m)
+	b, err := db.GetDBDriver().Get(m)
 	if err != nil {
 		return err
 	}
@@ -56,7 +57,7 @@ func (m *Admin) Find() (err error) {
 
 // 以自身为条件，判断是否存在
 func (m *Admin) Exist(tag string) error {
-	ok, err := GetDBDriver().Exist(m)
+	ok, err := db.GetDBDriver().Exist(m)
 	if ok {
 		return errors.New(tag + "已存在" + public.EndMark)
 	}

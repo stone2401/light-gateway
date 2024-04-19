@@ -2,6 +2,7 @@ package handler
 
 import (
 	"errors"
+	"time"
 
 	"github.com/gin-gonic/gin"
 	"github.com/stone2401/light-gateway/app/middleware"
@@ -38,7 +39,13 @@ func AdminInfo(ctx *gin.Context) {
 	middleware.ResponseSuccess(ctx, &dto.AdminInfoResponse{
 		ID:        token.ID,
 		Name:      token.UserName,
-		LoginTime: token.LoginTime,
+		LoginTime: time.Unix(token.LoginTime.Unix(), 0).Format("2006-01-02 15:04:05"),
+		Avatar:    "https://thirdqq.qlogo.cn/g?b=qq&s=100&nk=1743369777",
+		Remark:    "管理员",
+		Roles:     []string{"0"},
+		Nickname:  "stone2401",
+		Email:     "2919390584@qq.com",
+		Phone:     "15931112401",
 	})
 }
 

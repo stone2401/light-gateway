@@ -5,9 +5,11 @@ Mysql:
     username: root
     password: 123456123
     database: go_gateway
-Zookeeper:
-    Addrs:
-        - 127.0.0.1:2181
+Redis:
+    host: localhost
+    port: 6379
+    password: "!Shizhenfei123"
+    database: 0
 Jwt:
     key: alskjdahfAKLSFJDLlfaslhLSHljadfhlaSJhflakl
     issuer: stone2401

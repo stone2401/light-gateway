@@ -1,0 +1,55 @@
+[
+  {
+    "id": 31,
+    "path": "/system/monitor/serve",
+    "name": "服务监控",
+    "component": "system/monitor/serve/index",
+    "meta": {
+      "title": "服务监控",
+      "icon": "ant-design:desktop-outlined",
+      "isExt": false,
+      "extOpenMode": 1,
+      "type": 1,
+      "orderNo": 4,
+      "show": 1,
+      "activeMenu": null,
+      "status": 1,
+      "keepAlive": 0
+    }
+  },
+  {
+    "id": 41,
+    "path": "https://antdv.com/components/overview-cn",
+    "name": "帮助文档",
+    "meta": {
+      "title": "帮助文档",
+      "icon": "ion:tv-outline",
+      "isExt": true,
+      "extOpenMode": 2,
+      "type": 1,
+      "orderNo": 255,
+      "show": 1,
+      "activeMenu": null,
+      "status": 1,
+      "keepAlive": 0
+    }
+  },
+  {
+    "id": 51,
+    "path": "/about",
+    "name": "关于",
+    "component": "account/about",
+    "meta": {
+      "title": "关于",
+      "icon": "ant-design:info-circle-outlined",
+      "isExt": false,
+      "extOpenMode": 1,
+      "type": 1,
+      "orderNo": 260,
+      "show": 1,
+      "activeMenu": null,
+      "status": 1,
+      "keepAlive": 0
+    }
+  }
+]

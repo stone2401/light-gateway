@@ -15,13 +15,13 @@ import (
 )
 
 func RegisterAdminLogin(router *gin.RouterGroup) {
-	router.POST("/login", loginAdmin)
 }
 
 func RegisterAuth(router *gin.RouterGroup) {
 	// 配置自定义存储
 	captcha.SetCustomStore(redis.NewStore())
-
+	// 用户登录
+	router.POST("/login", loginAdmin)
 	// auth 验证码
 	router.GET("/captcha", authcaptcha)
 }

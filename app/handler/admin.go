@@ -2,6 +2,7 @@ package handler
 
 import (
 	"errors"
+	"fmt"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -36,6 +37,7 @@ func AdminInfo(ctx *gin.Context) {
 		return
 	}
 	token := value.(*public.Claims)
+	fmt.Printf("ctx.ClientIP(): %v\n", ctx.ClientIP())
 	middleware.ResponseSuccess(ctx, &dto.AdminInfoResponse{
 		ID:        token.ID,
 		Name:      token.UserName,
@@ -46,6 +48,7 @@ func AdminInfo(ctx *gin.Context) {
 		Nickname:  "stone2401",
 		Email:     "2919390584@qq.com",
 		Phone:     "15931112401",
+		Ip:        ctx.ClientIP(),
 	})
 }
 

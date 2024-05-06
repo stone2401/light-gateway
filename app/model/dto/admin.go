@@ -10,6 +10,7 @@ type AdminInfoResponse struct {
 	Nickname  string   `json:"nickname"`
 	Email     string   `json:"email"`
 	Phone     string   `json:"phone"`
+	Ip        string   `json:"ip"`
 }
 
 type AdminChangeRequest struct {

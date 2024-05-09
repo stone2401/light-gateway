@@ -14,19 +14,19 @@ var syncDao = []any{&Admin{}, &App{}, &ServiceAccessControl{}, &ServiceInfo{},
 }
 
 // 初始化数据函数
-var initFunc = []func(){initAdmin, initApp, initServiceAccessControl,
-	initServiceInfo, initServiceGrpcRule, initServiceHttpRule, initServiceLoadBalance,
-	initServiceTcpRule,
-}
+// var initFunc = []func(){initAdmin, initApp, initServiceAccessControl,
+// 	initServiceInfo, initServiceGrpcRule, initServiceHttpRule, initServiceLoadBalance,
+// 	initServiceTcpRule,
+// }
 
 func Init() {
 	// 同步表
 	go func() {
 		// 最大连接数设置
 		SyncTable()
-		for _, funcItem := range initFunc {
-			funcItem()
-		}
+		// for _, funcItem := range initFunc {
+		// 	funcItem()
+		// }
 		if config.Mode {
 			db.GetDBDriver().Logger().ShowSQL(config.Mode)
 		}

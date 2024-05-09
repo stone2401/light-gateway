@@ -3,7 +3,6 @@ package handler
 import (
 	"encoding/json"
 	"errors"
-	"fmt"
 	"os"
 	"path"
 	"time"
@@ -18,6 +17,7 @@ func RegisterAccount(router *gin.RouterGroup) {
 	router.GET("/profile", AccountProfile)
 	router.GET("/permissions", AccountPermissions)
 	router.GET("/menus", AccountMenu)
+	router.GET("/logout", AccountLogout)
 }
 
 // @Summary 获取账户资料
@@ -37,7 +37,6 @@ func AccountProfile(ctx *gin.Context) {
 		return
 	}
 	token := value.(*public.Claims)
-	fmt.Printf("ctx.ClientIP(): %v\n", ctx.ClientIP())
 	middleware.ResponseSuccess(ctx, &dto.AdminInfoResponse{
 		ID:        token.ID,
 		Name:      token.UserName,
@@ -70,7 +69,6 @@ func AccountMenu(ctx *gin.Context) {
 		return
 	}
 	f, err := os.ReadFile(path.Join(root, "conf", "route_group.json"))
-	fmt.Println(err)
 	if err != nil {
 		middleware.ResponseError(ctx, 2000, errors.New("用户菜单读取失败"))
 		return
@@ -92,4 +90,16 @@ func AccountMenu(ctx *gin.Context) {
 // @Router /system/permissions [get]
 func AccountPermissions(ctx *gin.Context) {
 	middleware.ResponseSuccess(ctx, public.SystemPermissions)
+}
+
+// @Summary 登出
+// @Description 登出
+// @Tags accountApi
+// @ID /account/logout
+// @Accept application/json
+// @Produce application/json
+// @Success 200 {object} middleware.ResponseErr{} "success"
+// @Router /account/logout [get]
+func AccountLogout(ctx *gin.Context) {
+	middleware.ResponseSuccess(ctx, nil)
 }

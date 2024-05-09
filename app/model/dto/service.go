@@ -10,24 +10,25 @@ import (
 
 type ServiceListRequest struct {
 	Info     string `json:"info" form:"info" lable:"关键词"`
-	PageNo   int    `json:"page_no" form:"page_no" label:"页数" rule:"notnull" example:"1"`
-	PageSize int    `json:"page_size" form:"page_size" label:"条数" rule:"notnull" example:"20"`
+	Page     int    `json:"page" form:"page" query:"page" label:"页数"  example:"1"`
+	PageSize int    `json:"pageSize" form:"pageSize" query:"pageSize" label:"条数" example:"20"`
 }
 
 type ServiceListResponse struct {
 	Total uint64            `json:"total" lable:"总数"`
-	List  []ServiceListItem `json:"list"`
+	Items []ServiceListItem `json:"items"`
+	Meta  BaseMeta          `json:"meta"`
 }
 
 type ServiceListItem struct {
 	ID          uint64 `json:"id"`
-	ServiceName string `json:"service_name"`
-	ServiceDesc string `json:"service_desc"`
-	LoadType    int    `json:"load_type"`
-	ServiceAddr string `json:"service_addr"`
+	ServiceName string `json:"serviceName"`
+	ServiceDesc string `json:"serviceDesc"`
+	LoadType    int    `json:"loadType"`
+	ServiceAddr string `json:"serviceAddr"`
 	QPS         uint64 `json:"qps"`
 	QPD         uint64 `json:"qpd"`
-	TotalNode   int    `json:"total_node"`
+	TotalNode   int    `json:"totalNode"`
 }
 type ServiceInfo struct {
 	ID       uint64 `json:"id" form:"id" rule:"notnull"`
@@ -79,7 +80,7 @@ type ServiceAccessControl struct {
 }
 
 type ServiceHttpRule struct {
-	RuleType       int    `json:"rule_type" form:"rule_type" label:"匹配类型 0=url前缀url_prefix 1=域名domain" example:"0"`                                               // 匹配类型 0=url前缀url_prefix 1=域名domain
+	RuleType       int    `json:"ruleType" form:"ruleType" label:"匹配类型 0=url前缀url_prefix 1=域名domain" example:"0"`                                                 // 匹配类型 0=url前缀url_prefix 1=域名domain
 	Rule           string `json:"rule" form:"rule" rule:"notnull" label:"type=domain表示域名，type=url_prefix时表示url前缀" example:"必填 域名或后缀"`                             // type=domain表示域名，type=url_prefix时表示url前缀
 	NeedHttps      bool   `json:"need_https" form:"need_https" label:"支持https 1=支持" example:"false"`                                                              // 支持https 1=支持
 	NeedStripUrl   bool   `json:"need_strip_url" form:"need_strip_url" lable:"启用strip_uri 1=启用" example:"false"`                                                  // 启用strip_uri 1=启用
@@ -90,8 +91,8 @@ type ServiceHttpRule struct {
 
 type ServiceAddHttpRequest struct {
 	// service_info 表字段
-	ServiceName string `json:"service_name" form:"service_name" rule:"notnull" label:"服务名称 6-128 数字字母下划线" example:"必填 服务名称" regexp:"^[a-zA-Z0-9_]{6,128}$"` // 服务名称
-	ServiceDesc string `json:"service_desc" form:"service_desc" rule:"notnull" label:"服务描述" example:"必填 服务描述" regexp:"^.{5,255}$"`                          // 服务描述
+	ServiceName string `json:"serviceName" form:"serviceName" rule:"notnull" label:"服务名称 6-128 数字字母下划线" example:"必填 服务名称" regexp:"^[a-zA-Z0-9_]{6,128}$"` // 服务名称
+	ServiceDesc string `json:"serviceDesc" form:"serviceDesc" rule:"notnull" label:"服务描述" example:"必填 服务描述" regexp:"^.{5,255}$"`                          // 服务描述
 	// service_hrrp_rule 表字段
 	ServiceHttpRule
 	// service_access_control 表字段
@@ -134,8 +135,8 @@ type ServiceUpdateHttpRequest struct {
 
 type ServiceAddTcpRequest struct {
 	// service_info 表字段
-	ServiceName string `json:"service_name" form:"service_name" rule:"notnull" label:"服务名称 6-128 数字字母下划线" example:"必填 服务名称" regexp:"^[a-zA-Z0-9_]{6,128}$"` // 服务名称
-	ServiceDesc string `json:"service_desc" form:"service_desc" rule:"notnull" label:"服务描述" example:"必填 服务描述" regexp:"^.{5,255}$"`                          // 服务描述
+	ServiceName string `json:"serviceName" form:"serviceName" rule:"notnull" label:"服务名称 6-128 数字字母下划线" example:"必填 服务名称" regexp:"^[a-zA-Z0-9_]{6,128}$"` // 服务名称
+	ServiceDesc string `json:"serviceDesc" form:"serviceDesc" rule:"notnull" label:"服务描述" example:"必填 服务描述" regexp:"^.{5,255}$"`                          // 服务描述
 	// service_hrrp_rule 表字段
 	Port int `json:"port" form:"port" xorm:"int 'port' notnull comment('端口')" rule:"notnull" label:"端口"`
 	// service_access_control 表字段
@@ -162,8 +163,8 @@ type ServiceUpdateTcpRequest struct {
 
 type ServiceAddGrpcRequest struct {
 	// service_info 表字段
-	ServiceName string `json:"service_name" form:"service_name" rule:"notnull" label:"服务名称 6-128 数字字母下划线" example:"必填 服务名称" regexp:"^[a-zA-Z0-9_]{6,128}$"` // 服务名称
-	ServiceDesc string `json:"service_desc" form:"service_desc" rule:"notnull" label:"服务描述" example:"必填 服务描述" regexp:"^.{5,255}$"`                          // 服务描述
+	ServiceName string `json:"serviceName" form:"serviceName" rule:"notnull" label:"服务名称 6-128 数字字母下划线" example:"必填 服务名称" regexp:"^[a-zA-Z0-9_]{6,128}$"` // 服务名称
+	ServiceDesc string `json:"serviceDesc" form:"serviceDesc" rule:"notnull" label:"服务描述" example:"必填 服务描述" regexp:"^.{5,255}$"`                          // 服务描述
 	// service_hrrp_rule 表字段
 	Port           int    `json:"port" form:"port" xorm:"int 'port' notnull comment('端口')" rule:"notnull" label:"端口"`
 	HeaderTransfor string `json:"header_transfor" form:"header_transfor" label:"header转换支持增加(add)、删除(del)、修改(edit) 格式: add headname headvalue 多个逗号间隔" example:""` //header转换支持增加(add)、删除(del)、修改(edit) 格式: add headname headvalue 多个逗号间隔
@@ -199,4 +200,8 @@ type ServiceUpdateGrpcRequest struct {
 type ServiceStatResponse struct {
 	Today     []uint64 `json:"today" form:"today" label:"今日流量"`
 	Yesterday []uint64 `json:"yesterday" form:"yesterday" label:"昨日流量"`
+}
+
+type ServiceDeleteRequest struct {
+	Id uint64 `json:"id" form:"id" rule:"notnull" uri:"id" label:"修改唯一识别"`
 }

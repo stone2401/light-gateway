@@ -33,7 +33,7 @@ func GetDBDriver() *xorm.Engine {
 		engine.SetMaxIdleConns(10)
 		engine.SetConnMaxLifetime(30 * time.Minute)
 		// 日志打印设置
-		engine.SetLogger(xormLog.NewSimpleLogger(config.GenLogFilename("xorm")))
+		// engine.SetLogger(xormLog.NewSimpleLogger(config.GenLogFilename("xorm")))
 		engine.Logger().SetLevel(xormLog.LOG_DEBUG)
 		// 设置前缀
 		tbMapper := names.NewPrefixMapper(names.SnakeMapper{}, "gateway_")

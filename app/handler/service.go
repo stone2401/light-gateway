@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"fmt"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -11,10 +12,10 @@ import (
 )
 
 func RegisterService(router *gin.RouterGroup) {
-	router.GET("/service_list", ServiceList)
-	router.GET("/service_delete", ServiceDelete)
-	router.GET("/service_detail", ServiceDetail)
+	router.GET("/", ServiceList)
 	router.GET("/service_stat", ServiceStat)
+	router.GET("/:id", ServiceDetail)
+	router.DELETE("/:id", ServiceDelete)
 
 	router.POST("/service_add_http", ServiceAddHttp)
 	router.POST("/service_update_http", ServiceUpdateHttp)
@@ -33,14 +34,15 @@ func RegisterService(router *gin.RouterGroup) {
 // @Param Authorization	header string true "token"
 // @Security ApiKeyAuth
 // @Param info query string false "关键词"
-// @Param page_no query int true "页数"
-// @Param page_size query int true "个数"
+// @Param page query int true "页数"
+// @Param pageSize query int true "个数"
 // @Accept application/json
 // @Produce json
 // @Success 200 {object} middleware.ResponseErr{data=dto.ServiceListResponse} "success"
-// @Router /service/service_list [get]
+// @Router /api/v1/service/list [get]
 func ServiceList(ctx *gin.Context) {
 	// 获取 ServiceListRequest 并绑定值
+	fmt.Println("ServiceList")
 	parmas := &dto.ServiceListRequest{}
 	if err := public.Authenticator(ctx, parmas); err != nil {
 		middleware.ResponseError(ctx, 1001, err)
@@ -51,6 +53,7 @@ func ServiceList(ctx *gin.Context) {
 	list, total, err := serviceList.PageList(parmas)
 	if err != nil {
 		middleware.ResponseError(ctx, 1002, err)
+		return
 	}
 	// 遍历获取需要的值
 	responseList := []dto.ServiceListItem{}
@@ -79,7 +82,13 @@ func ServiceList(ctx *gin.Context) {
 		}
 		responseList = append(responseList, responseItem)
 	}
-	middleware.ResponseSuccess(ctx, &dto.ServiceListResponse{List: responseList, Total: uint64(total)})
+	middleware.ResponseSuccess(ctx, &dto.ServiceListResponse{Items: responseList, Total: uint64(total), Meta: dto.BaseMeta{
+		TotalItems:   total,
+		ItemCount:    len(list),
+		ItemsPerPage: parmas.PageSize,
+		TotalPages:   (0 + total) / parmas.PageSize,
+		CurrentPage:  parmas.Page,
+	}})
 }
 
 // @Summary 服务删除
@@ -92,15 +101,16 @@ func ServiceList(ctx *gin.Context) {
 // @Accept application/json
 // @Produce json
 // @Success 200 {object} middleware.ResponseErr{data=string} "success"
-// @Router /service/service_delete [get]
+// @Router /service/:id [get]
 func ServiceDelete(ctx *gin.Context) {
-	serviceInfo := &dao.ServiceInfo{}
+	serviceDelete := &dto.ServiceDeleteRequest{}
 	// 绑定 ServiceInfo，之后就直接用这个对象进行查询
-	if err := public.Authenticator(ctx, serviceInfo); err != nil {
-		middleware.ResponseError(ctx, 1001, err)
+	if err := ctx.ShouldBindUri(serviceDelete); err != nil {
+		middleware.ResponseError(ctx, 1003, err)
 		return
 	}
 	// 进行删除
+	serviceInfo := &dao.ServiceInfo{Id: serviceDelete.Id}
 	err := serviceInfo.Delete()
 	if err != nil {
 		middleware.ResponseError(ctx, 1004, err)
@@ -125,6 +135,10 @@ func ServiceDelete(ctx *gin.Context) {
 func ServiceDetail(ctx *gin.Context) {
 	// 获取参数 id
 	serviceInfo := &dao.ServiceInfo{}
+	if err := ctx.BindUri(serviceInfo); err != nil {
+		middleware.ResponseError(ctx, 1003, err)
+		return
+	}
 	if err := public.Authenticator(ctx, serviceInfo); err != nil {
 		middleware.ResponseError(ctx, 1001, err)
 		return

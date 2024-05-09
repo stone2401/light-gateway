@@ -51,7 +51,7 @@ func (a *App) PageList(param *dto.ServiceListRequest) (list []App, totle uint64,
 	if param.Info != "" {
 		query = query.Where("app_id like ?", "%"+param.Info+"%").Or("name like ?", "%"+param.Info+"%")
 	}
-	err = query.Desc("id").Limit(param.PageSize, param.PageNo-1).Find(&list)
+	err = query.Desc("id").Limit(param.PageSize, param.Page-1).Find(&list)
 	return list, uint64(len(list)), err
 }
 

@@ -1,23 +1,5 @@
 [
   {
-    "id": 31,
-    "path": "/system/monitor/serve",
-    "name": "服务监控",
-    "component": "system/monitor/serve/index",
-    "meta": {
-      "title": "服务监控",
-      "icon": "ant-design:desktop-outlined",
-      "isExt": false,
-      "extOpenMode": 1,
-      "type": 1,
-      "orderNo": 4,
-      "show": 1,
-      "activeMenu": null,
-      "status": 1,
-      "keepAlive": 0
-    }
-  },
-  {
     "id": 41,
     "path": "https://antdv.com/components/overview-cn",
     "name": "帮助文档",
@@ -27,7 +9,7 @@
       "isExt": true,
       "extOpenMode": 2,
       "type": 1,
-      "orderNo": 255,
+      "orderNo": 3,
       "show": 1,
       "activeMenu": null,
       "status": 1,
@@ -45,7 +27,43 @@
       "isExt": false,
       "extOpenMode": 1,
       "type": 1,
-      "orderNo": 260,
+      "orderNo": 4,
+      "show": 1,
+      "activeMenu": null,
+      "status": 1,
+      "keepAlive": 0
+    }
+  },
+  {
+    "id": 61,
+    "path": "/system/service-item",
+    "name": "服务列表",
+    "component": "system/service-item/index",
+    "meta": {
+      "title": "服务列表",
+      "icon": "ant-design:book-outlined",
+      "isExt": false,
+      "extOpenMode": 1,
+      "type": 1,
+      "orderNo": 1,
+      "show": 1,
+      "activeMenu": null,
+      "status": 1,
+      "keepAlive": 0
+    }
+  },
+  {
+    "id": 71,
+    "path": "/system/monitor/serve",
+    "name": "系统监控",
+    "component": "system/monitor/serve/index",
+    "meta": {
+      "title": "系统监控",
+      "icon": "ant-design:desktop-outlined",
+      "isExt": false,
+      "extOpenMode": 1,
+      "type": 1,
+      "orderNo": 2,
       "show": 1,
       "activeMenu": null,
       "status": 1,

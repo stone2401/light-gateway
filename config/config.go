@@ -36,7 +36,7 @@ func Init() {
 	}
 	// 设置 log 输出
 	log.SetFlags(log.LstdFlags | log.Llongfile)
-	log.SetOutput(GenLogFilename("logs"))
+	// log.SetOutput(GenLogFilename("logs"))
 }
 
 func readConfigFile(b *[]byte, pwd string, file string) {

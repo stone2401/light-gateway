@@ -23,4 +23,13 @@ services:
     volumes:
       - ./data/redis:/data
       - ./conf/redis/redis.conf:/usr/local/etc/redis/redis.conf
+  Etcd:
+    image: "bitnami/etcd:latest"
+    container_name: etcd
+    environment:
+      - ALLOW_NONE_AUTHENTICATION=yes
+      - ETCD_ADVERTISE_CLIENT_URLS=http://etcd:2379
+    ports:
+      - 2379:2379
+      - 2380:2380
 # auth !Shizhenfei123

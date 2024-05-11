@@ -1,14 +1,15 @@
 package handler
 
 import (
-	"fmt"
 	"time"
 
 	"github.com/gin-gonic/gin"
 	"github.com/stone2401/light-gateway/app/middleware"
 	"github.com/stone2401/light-gateway/app/model/dao"
 	"github.com/stone2401/light-gateway/app/model/dto"
+	"github.com/stone2401/light-gateway/app/proxy"
 	"github.com/stone2401/light-gateway/app/public"
+	"github.com/stone2401/light-gateway/config"
 )
 
 func RegisterService(router *gin.RouterGroup) {
@@ -17,13 +18,12 @@ func RegisterService(router *gin.RouterGroup) {
 	router.GET("/:id", ServiceDetail)
 	router.DELETE("/:id", ServiceDelete)
 
-	router.POST("/service_add_http", ServiceAddHttp)
-	router.POST("/service_update_http", ServiceUpdateHttp)
-	router.POST("/service_add_tcp", ServiceAddTcp)
-	router.POST("/service_update_tcp", ServiceUpdateTcp)
-	router.POST("/service_add_grpc", ServiceAddGrpc)
-	router.POST("/service_update_grpc", ServiceUpdateGrpc)
-
+	router.POST("/http", ServiceAddHttp)
+	router.POST("/tcp", ServiceAddTcp)
+	router.POST("/grpc", ServiceAddGrpc)
+	router.PUT("/http/:id", ServiceUpdateHttp)
+	router.PUT("/tcp/:id", ServiceUpdateTcp)
+	router.PUT("/grpc/:id", ServiceUpdateGrpc)
 }
 
 // @Summary 服务列表
@@ -42,7 +42,6 @@ func RegisterService(router *gin.RouterGroup) {
 // @Router /api/v1/service/list [get]
 func ServiceList(ctx *gin.Context) {
 	// 获取 ServiceListRequest 并绑定值
-	fmt.Println("ServiceList")
 	parmas := &dto.ServiceListRequest{}
 	if err := public.Authenticator(ctx, parmas); err != nil {
 		middleware.ResponseError(ctx, 1001, err)
@@ -75,9 +74,10 @@ func ServiceList(ctx *gin.Context) {
 			ServiceName: item.ServiceName,
 			ServiceDesc: item.ServiceDesc,
 			LoadType:    item.LoadType,
-			ServiceAddr: detail.GetServiceAddr(),
+			ServiceAddr: detail.GetServiceAddr(ctx),
 			QPS:         0,
 			QPD:         0,
+			Status:      item.Status,
 			TotalNode:   len(detail.LoadBalance.FindIpList()),
 		}
 		responseList = append(responseList, responseItem)
@@ -111,7 +111,14 @@ func ServiceDelete(ctx *gin.Context) {
 	}
 	// 进行删除
 	serviceInfo := &dao.ServiceInfo{Id: serviceDelete.Id}
-	err := serviceInfo.Delete()
+	serviceDetail := &dao.ServiceDetail{Info: &dao.ServiceInfo{Id: serviceDelete.Id}}
+	err := serviceDetail.FindAll()
+	if err != nil {
+		middleware.ResponseError(ctx, 1004, err)
+		return
+	}
+	proxy.GetHttpProxy().Remove(serviceDetail)
+	err = serviceInfo.Delete()
 	if err != nil {
 		middleware.ResponseError(ctx, 1004, err)
 		return
@@ -217,6 +224,13 @@ func ServiceAddHttp(ctx *gin.Context) {
 		middleware.ResponseError(ctx, 1005, err)
 		return
 	}
+	// 检查端口是否被占用
+	if httpRule.NeedHttps {
+		params.Port = config.Config.Cluster.SSLPort
+	} else {
+		params.Port = config.Config.Cluster.Port
+	}
+	proxy.GetHttpProxy().Register(params)
 	// 保存
 	err = dao.TransactionSaveServiceAll(params, public.LoadTypeHttp)
 	if err != nil {
@@ -239,10 +253,28 @@ func ServiceAddHttp(ctx *gin.Context) {
 func ServiceUpdateHttp(ctx *gin.Context) {
 	// 获取参数并校验
 	params := &dto.ServiceUpdateHttpRequest{}
+	if err := ctx.BindUri(params); err != nil {
+		middleware.ResponseError(ctx, 1001, err)
+		return
+	}
 	if err := public.Authenticator(ctx, params); err != nil {
 		middleware.ResponseError(ctx, 1001, err)
 		return
 	}
+
+	// 检查端口是否被占用
+	if params.NeedHttps {
+		params.Port = config.Config.Cluster.SSLPort
+	} else {
+		params.Port = config.Config.Cluster.Port
+	}
+	serviceDetail := &dao.ServiceDetail{Info: &dao.ServiceInfo{Id: params.ID}}
+	err := serviceDetail.FindAll()
+	if err != nil {
+		middleware.ResponseError(ctx, 1004, err)
+		return
+	}
+	proxy.GetHttpProxy().Update(serviceDetail, &params.ServiceAddHttpRequest)
 	// 根据id更新数据
 	if err := dao.TransactionUpdateAll(params.ID, params); err != nil {
 		middleware.ResponseError(ctx, 1003, err)
@@ -306,6 +338,10 @@ func ServiceUpdateTcp(ctx *gin.Context) {
 	// ServiceUpdateTcpRequest 保存着需要更新的字段
 	// 获取参数并校验
 	params := &dto.ServiceUpdateTcpRequest{}
+	if err := ctx.BindUri(params); err != nil {
+		middleware.ResponseError(ctx, 1001, err)
+		return
+	}
 	if err := public.Authenticator(ctx, params); err != nil {
 		middleware.ResponseError(ctx, 1001, err)
 		return
@@ -373,6 +409,10 @@ func ServiceUpdateGrpc(ctx *gin.Context) {
 	// ServiceUpdateGrpcRequest 保存着需要更新的字段
 	// 获取参数并校验
 	params := &dto.ServiceUpdateGrpcRequest{}
+	if err := ctx.BindUri(params); err != nil {
+		middleware.ResponseError(ctx, 1001, err)
+		return
+	}
 	if err := public.Authenticator(ctx, params); err != nil {
 		middleware.ResponseError(ctx, 1001, err)
 		return

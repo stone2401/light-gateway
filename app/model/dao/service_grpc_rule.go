@@ -12,7 +12,7 @@ type ServiceGrpcRule struct {
 	Id             uint64 `json:"id" xorm:"bigint pk notnull autoincr 'id' comment('自增主键')"`
 	ServiceId      uint64 `json:"service_id" xorm:"bigint unique index notnull default(0) 'service_id'"`
 	Port           int    `json:"port" xorm:"int 'port' notnull comment('端口')"`
-	HeaderTransfor string `json:"header_transfor" xorm:"varchar(5000) notnull default('') 'header_transfor' comment('header转换支持增加(add)、删除(del)、修改(edit) 格式: add headname headvalue 多个逗号间隔')"`
+	HeaderTransfor string `json:"headerTransfor" xorm:"varchar(5000) notnull default('') 'header_transfor' comment('header转换支持增加(add)、删除(del)、修改(edit) 格式: add headname headvalue 多个逗号间隔')"`
 }
 
 func (s *ServiceGrpcRule) GetId() uint64 {

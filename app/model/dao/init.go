@@ -102,37 +102,34 @@ func initServiceAccessControl() {
 
 func initServiceInfo() {
 	serviceInfos := []ServiceInfo{
-		{Id: 34, LoadType: 0, ServiceName: "websocket_test", ServiceDesc: "websocket_test", IsDelete: 1},
-		{Id: 35, LoadType: 1, ServiceName: "test_grpc", ServiceDesc: "test_grpc", IsDelete: 1},
-		{Id: 36, LoadType: 2, ServiceName: "test_httpe", ServiceDesc: "test_httpe", IsDelete: 1},
-		{Id: 38, LoadType: 0, ServiceName: "service_name", ServiceDesc: "11111", IsDelete: 1},
-		{Id: 41, LoadType: 0, ServiceName: "service_name_tcp", ServiceDesc: "11111", IsDelete: 1},
-		{Id: 42, LoadType: 0, ServiceName: "service_name_tcp2", ServiceDesc: "11111", IsDelete: 1},
-		{Id: 43, LoadType: 1, ServiceName: "service_name_tcp4", ServiceDesc: "service_name_tcp4", IsDelete: 1},
-		{Id: 44, LoadType: 0, ServiceName: "websocket_service", ServiceDesc: "websocket_service", IsDelete: 1},
-		{Id: 45, LoadType: 1, ServiceName: "tcp_service", ServiceDesc: "tcp_desc", IsDelete: 1},
-		{Id: 46, LoadType: 1, ServiceName: "grpc_service", ServiceDesc: "grpc_desc", IsDelete: 1},
-		{Id: 47, LoadType: 0, ServiceName: "testsefsafs", ServiceDesc: "werrqrr", IsDelete: 1},
-		{Id: 48, LoadType: 0, ServiceName: "testsefsafs1", ServiceDesc: "werrqrr", IsDelete: 1},
-		{Id: 49, LoadType: 0, ServiceName: "testsefsafs1222", ServiceDesc: "werrqrr", IsDelete: 1},
-		{Id: 50, LoadType: 2, ServiceName: "grpc_service_name", ServiceDesc: "grpc_service_desc", IsDelete: 1},
-		{Id: 51, LoadType: 2, ServiceName: "gresafsf", ServiceDesc: "wesfsf", IsDelete: 1},
-		{Id: 52, LoadType: 2, ServiceName: "gresafsf11", ServiceDesc: "wesfsf", IsDelete: 1},
-		{Id: 53, LoadType: 2, ServiceName: "tewrqrw111", ServiceDesc: "123313", IsDelete: 1},
-		{Id: 54, LoadType: 2, ServiceName: "test_grpc_service1", ServiceDesc: "test_grpc_service1", IsDelete: 1},
-		{Id: 55, LoadType: 1, ServiceName: "test_tcp_service1", ServiceDesc: "redis服务代理", IsDelete: 1},
-		{Id: 56, LoadType: 0, ServiceName: "test_http_service", ServiceDesc: "测试HTTP代理", IsDelete: 0},
-		{Id: 57, LoadType: 1, ServiceName: "test_tcp_service", ServiceDesc: "测试TCP代理", IsDelete: 0},
-		{Id: 58, LoadType: 2, ServiceName: "test_grpc_service", ServiceDesc: "测试GRPC服务", IsDelete: 0},
-		{Id: 59, LoadType: 0, ServiceName: "test.com:8080", ServiceDesc: "测试域名接入", IsDelete: 0},
-		{Id: 60, LoadType: 0, ServiceName: "test_strip_uri", ServiceDesc: "测试路径接入", IsDelete: 0},
-		{Id: 61, LoadType: 0, ServiceName: "test_https_server", ServiceDesc: "测试https服务", IsDelete: 0},
+		{Id: 34, LoadType: 0, ServiceName: "websocket_test", ServiceDesc: "websocket_test"},
+		{Id: 35, LoadType: 1, ServiceName: "test_grpc", ServiceDesc: "test_grpc"},
+		{Id: 36, LoadType: 2, ServiceName: "test_httpe", ServiceDesc: "test_httpe"},
+		{Id: 38, LoadType: 0, ServiceName: "service_name", ServiceDesc: "11111"},
+		{Id: 41, LoadType: 0, ServiceName: "service_name_tcp", ServiceDesc: "11111"},
+		{Id: 42, LoadType: 0, ServiceName: "service_name_tcp2", ServiceDesc: "11111"},
+		{Id: 43, LoadType: 1, ServiceName: "service_name_tcp4", ServiceDesc: "service_name_tcp4"},
+		{Id: 44, LoadType: 0, ServiceName: "websocket_service", ServiceDesc: "websocket_service"},
+		{Id: 45, LoadType: 1, ServiceName: "tcp_service", ServiceDesc: "tcp_desc"},
+		{Id: 46, LoadType: 1, ServiceName: "grpc_service", ServiceDesc: "grpc_desc"},
+		{Id: 47, LoadType: 0, ServiceName: "testsefsafs", ServiceDesc: "werrqrr"},
+		{Id: 48, LoadType: 0, ServiceName: "testsefsafs1", ServiceDesc: "werrqrr"},
+		{Id: 49, LoadType: 0, ServiceName: "testsefsafs1222", ServiceDesc: "werrqrr"},
+		{Id: 50, LoadType: 2, ServiceName: "grpc_service_name", ServiceDesc: "grpc_service_desc"},
+		{Id: 51, LoadType: 2, ServiceName: "gresafsf", ServiceDesc: "wesfsf"},
+		{Id: 52, LoadType: 2, ServiceName: "gresafsf11", ServiceDesc: "wesfsf"},
+		{Id: 53, LoadType: 2, ServiceName: "tewrqrw111", ServiceDesc: "123313"},
+		{Id: 54, LoadType: 2, ServiceName: "test_grpc_service1", ServiceDesc: "test_grpc_service1"},
+		{Id: 55, LoadType: 1, ServiceName: "test_tcp_service1", ServiceDesc: "redis服务代理"},
+		{Id: 56, LoadType: 0, ServiceName: "test_http_service", ServiceDesc: "测试HTTP代理"},
+		{Id: 57, LoadType: 1, ServiceName: "test_tcp_service", ServiceDesc: "测试TCP代理"},
+		{Id: 58, LoadType: 2, ServiceName: "test_grpc_service", ServiceDesc: "测试GRPC服务"},
+		{Id: 59, LoadType: 0, ServiceName: "test.com:8080", ServiceDesc: "测试域名接入"},
+		{Id: 60, LoadType: 0, ServiceName: "test_strip_uri", ServiceDesc: "测试路径接入"},
+		{Id: 61, LoadType: 0, ServiceName: "test_https_server", ServiceDesc: "测试https服务"},
 	}
 	for _, serviceInfo := range serviceInfos {
 		insertTable("serviceInfo", &serviceInfo)
-		if serviceInfo.IsDelete == 1 && serviceInfo.DeleteAt.IsZero() {
-			db.GetDBDriver().Delete(&serviceInfo)
-		}
 	}
 }
 
@@ -148,19 +145,19 @@ func initServiceGrpcRule() {
 }
 func initServiceHttpRule() {
 	serviceHttpRules := []ServiceHttpRule{
-		{165, 35, 1, "", false, false, false, "", ""},
-		{168, 34, 0, "", false, false, false, "", ""},
-		{170, 36, 0, "", false, false, false, "", ""},
-		{171, 38, 0, "/abc", true, false, true, "^/abc $1", "add head1 value1"},
-		{172, 43, 0, "/usr", true, true, false, "^/afsaasf $1,^/afsaasf $1", ""},
-		{173, 44, 1, "www.test.com", true, true, true, "", ""},
-		{174, 47, 1, "www.test.com", true, true, true, "", ""},
-		{175, 48, 1, "www.test.com", true, true, true, "", ""},
-		{176, 49, 1, "www.test.com", true, true, true, "", ""},
-		{177, 56, 0, "/test_http_service", true, true, true, "^/test_http_service/abb/{.*} /test_http_service/bba/$1", "add header_name header_value"},
-		{178, 59, 1, "test.com", false, true, true, "", "add headername headervalue"},
-		{179, 60, 0, "/test_strip_uri", false, true, false, "^/aaa/{.*} /bbb/$1", ""},
-		{180, 61, 0, "/test_https_server", true, true, false, "", ""},
+		{165, 35, 8080, 1, "", false, false, false, "", ""},
+		{168, 34, 8080, 0, "", false, false, false, "", ""},
+		{170, 36, 8080, 0, "", false, false, false, "", ""},
+		{171, 38, 8080, 0, "/abc", true, false, true, "^/abc $1", "add head1 value1"},
+		{172, 43, 8080, 0, "/usr", true, true, false, "^/afsaasf $1,^/afsaasf $1", ""},
+		{173, 44, 8080, 1, "www.test.com", true, true, true, "", ""},
+		{174, 47, 8080, 1, "www.test.com", true, true, true, "", ""},
+		{175, 48, 8080, 1, "www.test.com", true, true, true, "", ""},
+		{176, 49, 8080, 1, "www.test.com", true, true, true, "", ""},
+		{177, 56, 8080, 0, "/test_http_service", true, true, true, "^/test_http_service/abb/{.*} /test_http_service/bba/$1", "add header_name header_value"},
+		{178, 59, 8080, 1, "test.com", false, true, true, "", "add headername headervalue"},
+		{179, 60, 8080, 0, "/test_strip_uri", false, true, false, "^/aaa/{.*} /bbb/$1", ""},
+		{180, 61, 8080, 0, "/test_https_server", true, true, false, "", ""},
 	}
 	for _, serviceHttpRule := range serviceHttpRules {
 		insertTable("serviceHttpRule", &serviceHttpRule)

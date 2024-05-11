@@ -4,12 +4,12 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/gin-gonic/gin"
 	"github.com/jinzhu/copier"
 	"github.com/pkg/errors"
 
 	"github.com/stone2401/light-gateway/app/model/dto"
 	"github.com/stone2401/light-gateway/app/public"
-	"github.com/stone2401/light-gateway/config"
 )
 
 // ServiceDetail 任何操作都是通过 Info 字段进行的，所以 Info 字段必须初始化
@@ -131,29 +131,23 @@ func (s *ServiceDetail) FindAccessControl() (err error) {
 	return nil
 }
 
-func (s *ServiceDetail) GetServiceAddr() string {
+func (s *ServiceDetail) GetServiceAddr(ctx *gin.Context) string {
 	var builder strings.Builder
-	clusterIp := config.Config.Cluster.IP
-	clusterPort := config.Config.Cluster.Port
-	sslPort := config.Config.SSLPort
-	builder.WriteString(clusterIp + ":")
+	addr := ctx.Request.Host
+	builder.WriteString(strings.Split(addr, ":")[0] + ":")
 	switch s.Info.LoadType {
 	case public.LoadTypeHttp:
 		if s.HttpRule.RuleType == public.HTTPRuleTypeDomainURL {
 			builder.Reset()
 			builder.WriteString(s.HttpRule.Rule)
 		} else if s.HttpRule.RuleType == public.HTTPRuleTypePrefixURL {
-			if s.HttpRule.NeedHttps {
-				builder.WriteString(strconv.Itoa(sslPort))
-			} else {
-				builder.WriteString(strconv.Itoa(clusterPort))
-			}
-			builder.WriteString(s.HttpRule.Rule)
+			builder.WriteString(strconv.Itoa(s.HttpRule.Port) + s.HttpRule.Rule)
 		}
 	case public.LoadTypeTcp:
 		builder.WriteString(strconv.Itoa(s.TcpRule.Port))
 	case public.LoadTypeGrpc:
 		builder.WriteString(strconv.Itoa(s.GrpcRule.Port))
 	}
+	// 在 ctx 中获取到的地址是 0.0.0.0:8080，需要进行替换
 	return builder.String()
 }

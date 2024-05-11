@@ -13,13 +13,12 @@ import (
 // 网关基本信息表，所有操作通过 Id  字段进行，必须初始化
 type ServiceInfo struct {
 	Id          uint64    `json:"id" uri:"id" xorm:"bigint pk autoincr 'id' comment('自增主键')" rule:"notnull" label:"ID" form:"id"`
-	LoadType    int       `json:"load_type" xorm:"tinyint(4) 'load_type' notnull default(0) comment('负载类型 0=http 1=tcp 2=grpc')"`
-	ServiceName string    `json:"service_name" xorm:"varchar(255) 'service_name' notnull unique comment('服务名称 6-128 数字字母下划线')"`
-	ServiceDesc string    `json:"service_desc" xorm:"varchar(255) 'service_desc' default('') comment('服务描述')"`
+	LoadType    int       `json:"loadType" xorm:"tinyint(4) 'load_type' notnull default(0) comment('负载类型 0=http 1=tcp 2=grpc')"`
+	ServiceName string    `json:"serviceName" xorm:"varchar(255) 'service_name' notnull unique comment('服务名称 6-128 数字字母下划线')"`
+	ServiceDesc string    `json:"serviceDesc" xorm:"varchar(255) 'service_desc' default('') comment('服务描述')"`
+	Status      int       `json:"status" xorm:"tinyint(4) 'status' notnull default(0) comment('开关 0 关 1 开')"`
 	CreateAt    time.Time `json:"create_at" xorm:"created 'create_at' comment('创建时间')"`
 	UpdateAt    time.Time `json:"update_at" xorm:"updated 'update_at' comment('更新时间')"`
-	DeleteAt    time.Time `json:"delete_at" xorm:"deleted 'delete_at' comment('删除时间')"`
-	IsDelete    int       `json:"is_delete" xorm:"int 'is_delete' notnull default(0) comment('是否删除 1=删除')"`
 }
 
 func (m *ServiceInfo) Find() (err error) {
@@ -43,6 +42,9 @@ func (s *ServiceInfo) PageList(param *dto.ServiceListRequest) (list []ServiceInf
 		query = query.Where("service_name like ?", "%"+param.Info+"%").Or("service_desc like ?", "%"+param.Info+"%")
 	}
 	err = query.Desc("id").Limit(param.PageSize, param.Page-1).Find(&list)
+	if err != nil {
+		return nil, 0, err
+	}
 	count, err := query.Count(s)
 	if err != nil {
 		return nil, 0, err

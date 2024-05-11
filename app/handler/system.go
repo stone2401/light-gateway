@@ -73,8 +73,7 @@ func (o *OsStat) WatchStat() {
 }
 
 func (o *OsStat) UpdateStat() {
-	o.mu.Lock()
-	defer o.mu.Unlock()
+
 	// 获取cpu信息
 	cpuInfo, _ := cpu.Info()
 	// 获取负载信息
@@ -88,6 +87,8 @@ func (o *OsStat) UpdateStat() {
 	}
 	memory, _ := mem.VirtualMemory()
 	diskOs, _ := disk.Usage("/")
+	o.mu.Lock()
+	defer o.mu.Unlock()
 	stat := &dto.Stat{
 		Runtime: dto.Runtime{
 			NpmVersion:  "10.2.4",

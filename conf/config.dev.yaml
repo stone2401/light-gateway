@@ -13,8 +13,11 @@ Redis:
 Jwt:
     key: alskjdahfAKLSFJDLlfaslhLSHljadfhlaSJhflakl
     issuer: stone2401
-    time_out: 60
+    time_out: 300
 Cluster:
     ip: 0.0.0.0
     port: 29193
     ssl_port: 4880
+Etcd:
+    endpoints:
+        - 127.0.0.1:2379

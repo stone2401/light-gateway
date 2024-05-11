@@ -15,10 +15,10 @@ type ServiceLoadBalance struct {
 	CheckMethod            int    `json:"check_method" xorm:"int 'check_method' notnull default(0) comment('检查方法 0=tcpchk,检测端口是否握手成功')"`
 	CheckTimeout           int    `json:"check_timeout" xorm:"int 'check_timeout' notnull default(0) comment('check超时时间,单位s')"`
 	CheckInterval          int    `json:"check_interval" xorm:"int 'check_interval' notnull default(0) comment('检查间隔, 单位s')"`
-	RoundType              int    `json:"round_type" xorm:"int 'round_type' notnull default(0) comment('轮询方式 0=random 1=round-robin 2=weight_round-robin 3=ip_hash')"`
-	IpList                 string `json:"ip_list" xorm:"varchar(2000) 'ip_list' notnull default('') comment('ip列表')"`
-	WeightList             string `json:"weight_list" xorm:"varchar(2000) 'weight_list' notnull default('') comment('权重列表')"`
-	ForbidList             string `json:"forbid_list" xorm:"varchar(2000) 'forbid_list' notnull default('') comment('禁用ip列表')"`
+	RoundType              int    `json:"roundType" xorm:"int 'round_type' notnull default(0) comment('轮询方式 0=random 1=round-robin 2=weight_round-robin 3=ip_hash')"`
+	IpList                 string `json:"ipList" xorm:"varchar(2000) 'ip_list' notnull default('') comment('ip列表')"`
+	WeightList             string `json:"weightList" xorm:"varchar(2000) 'weight_list' notnull default('') comment('权重列表')"`
+	ForbidList             string `json:"forbidList" xorm:"varchar(2000) 'forbid_list' notnull default('') comment('禁用ip列表')"`
 	UpstreamConnectTimeout int    `json:"upstream_connect_timeout" xorm:"int 'upstream_connect_timeout' notnull default(0) comment('建立连接超时, 单位s')"`
 	UpstreamHeaderTimeout  int    `json:"upstream_header_timeout" xorm:"int 'upstream_header_timeout' notnull default(0) comment('获取header超时, 单位s')"`
 	UpstreamIdleTimeout    int    `json:"upstream_idle_timeout" xorm:"int 'upstream_idle_timeout' notnull default(0) comment('链接最大空闲时间, 单位s')"`
@@ -26,7 +26,14 @@ type ServiceLoadBalance struct {
 }
 
 func (s *ServiceLoadBalance) FindIpList() []string {
-	return strings.Split(s.IpList, ",")
+	ipList := []string{}
+	sp := strings.Split(s.IpList, ",")
+	for _, ip := range sp {
+		if ip != "" {
+			ipList = append(ipList, ip)
+		}
+	}
+	return ipList
 }
 
 func (s *ServiceLoadBalance) GetId() uint64 {

@@ -28,22 +28,20 @@ type ServiceListItem struct {
 	ServiceAddr string `json:"serviceAddr"`
 	QPS         uint64 `json:"qps"`
 	QPD         uint64 `json:"qpd"`
+	Status      int    `json:"status"` // 0 关 1 开
 	TotalNode   int    `json:"totalNode"`
 }
-type ServiceInfo struct {
-	ID       uint64 `json:"id" form:"id" rule:"notnull"`
-	LoadType int    `json:"load_type" form:"load_type" rule:"notnull"`
-}
+
 type ServiceLoadBalance struct {
 	// service_load_balance 表字段
-	RoundType              int    `json:"round_type" form:"round_type" example:"0" label:"轮询方式 0=random 1=round-robin 2=weight_round-robin 3=ip_hash"` //轮询方式 0=random 1=round-robin 2=weight_round-robin 3=ip_hash
-	IpList                 string `json:"ip_list" form:"ip_list" rule:"notnull" label:"ip列表" example:"47.113.203.197:2401"`                            // ip列表
-	WeightList             string `json:"weight_list" form:"weight_list" label:"权重列表" example:"10"`                                                    //权重列表
-	ForbidList             string `json:"forbid_list" form:"forbid_list" example:"" label:"禁用ip列表"`                                                    // 禁用ip列表
-	UpstreamConnectTimeout int    `json:"upstream_connect_timeout" form:"upstream_connect_timeout" example:"0" label:"建立连接超时, 单位s"`                    // 建立连接超时, 单位s
-	UpstreamHeaderTimeout  int    `json:"upstream_header_timeout" form:"upstream_header_timeout" example:"0" label:"获取header超时, 单位s"`                  // 获取header超时, 单位s
-	UpstreamIdleTimeout    int    `json:"upstream_idle_timeout" form:"upstream_idle_timeout" example:"0" label:"链接最大空闲时间, 单位s"`                        // 链接最大空闲时间, 单位s
-	UpstreamMaxIdle        int    `json:"upstream_max_idle" form:"upstream_max_idle" example:"0" label:"最大空闲链接数"`                                      // 最大空闲链接数
+	RoundType              int    `json:"roundType" form:"round_type" example:"0" label:"轮询方式 0=random 1=round-robin 2=weight_round-robin 3=ip_hash"` //轮询方式 0=random 1=round-robin 2=weight_round-robin 3=ip_hash
+	IpList                 string `json:"ipList" form:"ip_list" rule:"notnull" label:"ip列表" example:"47.113.203.197:2401"`                            // ip列表
+	WeightList             string `json:"weightList" form:"weight_list" label:"权重列表" example:"10"`                                                    //权重列表
+	ForbidList             string `json:"forbidList" form:"forbid_list" example:"" label:"禁用ip列表"`                                                    // 禁用ip列表
+	UpstreamConnectTimeout int    `json:"upstream_connect_timeout" form:"upstream_connect_timeout" example:"0" label:"建立连接超时, 单位s"`                   // 建立连接超时, 单位s
+	UpstreamHeaderTimeout  int    `json:"upstream_header_timeout" form:"upstream_header_timeout" example:"0" label:"获取header超时, 单位s"`                 // 获取header超时, 单位s
+	UpstreamIdleTimeout    int    `json:"upstream_idle_timeout" form:"upstream_idle_timeout" example:"0" label:"链接最大空闲时间, 单位s"`                       // 链接最大空闲时间, 单位s
+	UpstreamMaxIdle        int    `json:"upstream_max_idle" form:"upstream_max_idle" example:"0" label:"最大空闲链接数"`                                     // 最大空闲链接数
 }
 
 func (s *ServiceLoadBalance) VerifyIpWeight(err *strings.Builder) ([]string, []string) {
@@ -73,26 +71,28 @@ func (s *ServiceLoadBalance) VerifyIpWeight(err *strings.Builder) ([]string, []s
 type ServiceAccessControl struct {
 	// service_access_control 表字段
 	OpenAuth          bool   `json:"open_auth" form:"open_auth" example:"false" label:"是否开启权限 1=开启"`             // 是否开启权限 1=开启
-	BlackList         string `json:"black_list" form:"black_list" example:"" label:"黑名单"`                        // 黑名单
-	WhiteList         string `json:"white_list" form:"white_list" example:"" label:"白名单"`                        // 白名单
+	BlackList         string `json:"blacklist" form:"black_list" example:"" label:"黑名单"`                         // 黑名单
+	WhiteList         string `json:"whiteList" form:"white_list" example:"" label:"白名单"`                         // 白名单
 	ClientipFlowLimit int    `json:"clientip_flow_limit" form:"clientip_flow_limit" example:"0" label:"客户端ip限流"` // 客户端ip限流
 	ServiceFlowLimit  int    `json:"service_flow_limit" form:"service_flow_limit" example:"0" label:"服务的限流"`     // 服务的限流
 }
 
 type ServiceHttpRule struct {
-	RuleType       int    `json:"ruleType" form:"ruleType" label:"匹配类型 0=url前缀url_prefix 1=域名domain" example:"0"`                                                 // 匹配类型 0=url前缀url_prefix 1=域名domain
-	Rule           string `json:"rule" form:"rule" rule:"notnull" label:"type=domain表示域名，type=url_prefix时表示url前缀" example:"必填 域名或后缀"`                             // type=domain表示域名，type=url_prefix时表示url前缀
-	NeedHttps      bool   `json:"need_https" form:"need_https" label:"支持https 1=支持" example:"false"`                                                              // 支持https 1=支持
-	NeedStripUrl   bool   `json:"need_strip_url" form:"need_strip_url" lable:"启用strip_uri 1=启用" example:"false"`                                                  // 启用strip_uri 1=启用
-	NeedWebsocket  bool   `json:"need_websocket" form:"need_websocket" label:"是否支持websocket 1=支持" example:"false"`                                                // 是否支持websocket 1=支持
-	UrlRewrite     string `json:"url_rewrite" form:"url_rewrite" label:"url重写功能 格式：^/gatekeeper/test_service(.*) $1 多个逗号间隔" example:""`                           // url重写功能 格式：^/gatekeeper/test_service(.*) $1 多个逗号间隔
-	HeaderTransfor string `json:"header_transfor" form:"header_transfor" label:"header转换支持增加(add)、删除(del)、修改(edit) 格式: add headname headvalue 多个逗号间隔" example:""` //header转换支持增加(add)、删除(del)、修改(edit) 格式: add headname headvalue 多个逗号间隔
+	Port           int    `json:"port" form:"port" label:"端口号" example:""`
+	RuleType       int    `json:"ruleType" form:"ruleType" label:"匹配类型 0=url前缀url_prefix 1=域名domain" example:"0"`                                                // 匹配类型 0=url前缀url_prefix 1=域名domain
+	Rule           string `json:"rule" form:"rule" rule:"notnull" label:"type=domain表示域名，type=url_prefix时表示url前缀" example:"必填 域名或后缀"`                            // type=domain表示域名，type=url_prefix时表示url前缀
+	NeedHttps      bool   `json:"needHttps" form:"need_https" label:"支持https 1=支持" example:"false"`                                                              // 支持https 1=支持
+	NeedStripUrl   bool   `json:"need_strip_url" form:"need_strip_url" lable:"启用strip_uri 1=启用" example:"false"`                                                 // 启用strip_uri 1=启用
+	NeedWebsocket  bool   `json:"needWebsocket" form:"need_websocket" label:"是否支持websocket 1=支持" example:"false"`                                                // 是否支持websocket 1=支持
+	UrlRewrite     string `json:"urlRewrite" form:"url_rewrite" label:"url重写功能 格式：^/gatekeeper/test_service(.*) $1 多个逗号间隔" example:""`                           // url重写功能 格式：^/gatekeeper/test_service(.*) $1 多个逗号间隔
+	HeaderTransfor string `json:"headerTransfor" form:"header_transfor" label:"header转换支持增加(add)、删除(del)、修改(edit) 格式: add headname headvalue 多个逗号间隔" example:""` //header转换支持增加(add)、删除(del)、修改(edit) 格式: add headname headvalue 多个逗号间隔
 }
 
 type ServiceAddHttpRequest struct {
 	// service_info 表字段
 	ServiceName string `json:"serviceName" form:"serviceName" rule:"notnull" label:"服务名称 6-128 数字字母下划线" example:"必填 服务名称" regexp:"^[a-zA-Z0-9_]{6,128}$"` // 服务名称
 	ServiceDesc string `json:"serviceDesc" form:"serviceDesc" rule:"notnull" label:"服务描述" example:"必填 服务描述" regexp:"^.{5,255}$"`                          // 服务描述
+	Status      int    `json:"status"`
 	// service_hrrp_rule 表字段
 	ServiceHttpRule
 	// service_access_control 表字段
@@ -129,7 +129,8 @@ func (s *ServiceAddHttpRequest) Check(err *strings.Builder) {
 }
 
 type ServiceUpdateHttpRequest struct {
-	ID uint64 `json:"id" form:"id" rule:"notnull" label:"修改唯一识别"`
+	ID       uint64 `json:"id" form:"id" uri:"id" rule:"notnull" label:"修改唯一识别"`
+	LoadType int    `json:"loadType" xorm:"tinyint(4) 'load_type' notnull default(0) comment('负载类型 0=http 1=tcp 2=grpc')"`
 	ServiceAddHttpRequest
 }
 
@@ -137,6 +138,8 @@ type ServiceAddTcpRequest struct {
 	// service_info 表字段
 	ServiceName string `json:"serviceName" form:"serviceName" rule:"notnull" label:"服务名称 6-128 数字字母下划线" example:"必填 服务名称" regexp:"^[a-zA-Z0-9_]{6,128}$"` // 服务名称
 	ServiceDesc string `json:"serviceDesc" form:"serviceDesc" rule:"notnull" label:"服务描述" example:"必填 服务描述" regexp:"^.{5,255}$"`                          // 服务描述
+	Status      int    `json:"status"`
+
 	// service_hrrp_rule 表字段
 	Port int `json:"port" form:"port" xorm:"int 'port' notnull comment('端口')" rule:"notnull" label:"端口"`
 	// service_access_control 表字段
@@ -157,7 +160,9 @@ func (s *ServiceAddTcpRequest) Check(err *strings.Builder) {
 }
 
 type ServiceUpdateTcpRequest struct {
-	ID uint64 `json:"id" form:"id" rule:"notnull" label:"修改唯一识别"`
+	ID       uint64 `json:"id" form:"id" uri:"id" rule:"notnull" label:"修改唯一识别"`
+	LoadType int    `json:"loadType" xorm:"tinyint(4) 'load_type' notnull default(0) comment('负载类型 0=http 1=tcp 2=grpc')"`
+	Status   int    `json:"status"`
 	ServiceAddTcpRequest
 }
 
@@ -165,6 +170,8 @@ type ServiceAddGrpcRequest struct {
 	// service_info 表字段
 	ServiceName string `json:"serviceName" form:"serviceName" rule:"notnull" label:"服务名称 6-128 数字字母下划线" example:"必填 服务名称" regexp:"^[a-zA-Z0-9_]{6,128}$"` // 服务名称
 	ServiceDesc string `json:"serviceDesc" form:"serviceDesc" rule:"notnull" label:"服务描述" example:"必填 服务描述" regexp:"^.{5,255}$"`                          // 服务描述
+	Status      int    `json:"status"`
+
 	// service_hrrp_rule 表字段
 	Port           int    `json:"port" form:"port" xorm:"int 'port' notnull comment('端口')" rule:"notnull" label:"端口"`
 	HeaderTransfor string `json:"header_transfor" form:"header_transfor" label:"header转换支持增加(add)、删除(del)、修改(edit) 格式: add headname headvalue 多个逗号间隔" example:""` //header转换支持增加(add)、删除(del)、修改(edit) 格式: add headname headvalue 多个逗号间隔
@@ -193,7 +200,9 @@ func (s *ServiceAddGrpcRequest) Check(err *strings.Builder) {
 }
 
 type ServiceUpdateGrpcRequest struct {
-	ID uint64 `json:"id" form:"id" rule:"notnull" label:"修改唯一识别"`
+	ID       uint64 `json:"id" form:"id" uri:"id" rule:"notnull" label:"修改唯一识别"`
+	LoadType int    `json:"loadType" xorm:"tinyint(4) 'load_type' notnull default(0) comment('负载类型 0=http 1=tcp 2=grpc')"`
+	Status   int    `json:"status"`
 	ServiceAddGrpcRequest
 }
 

@@ -54,6 +54,7 @@ type Configs struct {
 	JWT        `yaml:"Jwt"`
 	Cluster    `yaml:"Cluster"`
 	DriverName string `yaml:"DriverName"`
+	Etcd       `yaml:"Etcd"`
 }
 
 // mysql 配置结构体
@@ -80,9 +81,15 @@ type JWT struct {
 }
 
 type Cluster struct {
-	IP      string `json:"ip" yaml:"ip"`
-	Port    int    `json:"port" yaml:"port"`
-	SSLPort int    `json:"ssl_port" yaml:"ssl_port"`
+	IP          string `json:"ip" yaml:"ip"`
+	Port        int    `json:"port" yaml:"port"`
+	SSLPort     int    `json:"ssl_port" yaml:"ssl_port"`
+	SSLCertFile string `json:"ssl_cert_file" yaml:"ssl_cert_file"`
+	SSLKeyFile  string `json:"ssl_key_file" yaml:"ssl_key_file"`
+}
+
+type Etcd struct {
+	Endpoints []string `json:"endpoints" yaml:"endpoints"`
 }
 
 // 获取 database uri

@@ -16,3 +16,13 @@ type ServiceStatAllItemResponse struct {
 	Name  string `json:"name"`
 	Value uint64 `json:"value"`
 }
+
+type ServiceDashboardResponse struct {
+	ServiceNum      int64   `json:"serviceNum" form:"serviceNum"`
+	CurrentQps      int64   `json:"currentQps" form:"currentQps"`
+	TodayRequestNum int64   `json:"todayRequestNum" form:"today_request_num"`
+	OpenService     int64   `json:"openService" form:"openService"`
+	YesterDates     []int64 `json:"yesterDates" form:"yesterDates"`
+	Times           []int   `json:"times" form:"times"`
+	Datas           []int   `json:"datas" form:"datas"`
+}

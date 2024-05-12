@@ -18,8 +18,8 @@ Cluster:
     ip: 0.0.0.0
     port: 8080
     ssl_port: 4433
-    ssl_cert_file: ./certs/server.crt
-    ssl_key_file: ./certs/server.key
+    ssl_cert_file: /certs/server.crt
+    ssl_key_file: /certs/server.key
 Etcd:
     endpoints:
         - 127.0.0.1:2379

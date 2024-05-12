@@ -31,6 +31,7 @@ func main() {
 	RouterV1 := app.Group("/api/v1")
 	{
 		v1.RegisterRouterV1(RouterV1)
+		app.Static("/static", "./static")
 	}
 	RouterV2 := app.Group("/api/v2")
 	{
@@ -65,5 +66,6 @@ func InitSingleton() {
 	go etcd.GetMonitor().Watch()
 
 	// http proxy
-	proxy.GetHttpProxy()
+	go proxy.GetSurveillant().Watch()
+	proxy.GetHttpProxy().Init()
 }

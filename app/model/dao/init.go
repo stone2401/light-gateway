@@ -10,7 +10,7 @@ import (
 
 // 要被初始化的 dao
 var syncDao = []any{&Admin{}, &App{}, &ServiceAccessControl{}, &ServiceInfo{},
-	&ServiceGrpcRule{}, &ServiceHttpRule{}, &ServiceTcpRule{}, &ServiceLoadBalance{},
+	&ServiceGrpcRule{}, &ServiceHttpRule{}, &ServiceTcpRule{}, &ServiceLoadBalance{}, &Qps{},
 }
 
 // 初始化数据函数

@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"math"
 	"net/http"
+	"os"
 	"runtime"
 	"sync"
 	"time"
@@ -27,6 +28,7 @@ func RegisterSystem(router *gin.RouterGroup) {
 	go osStat.WatchStat()
 	router.GET("/sse/:uid", SystemSse)
 	router.GET("/serve/stat", osStat.ServeStat)
+	router.GET("/serve/help", GetHelpMarkdown)
 }
 
 func SystemSse(ctx *gin.Context) {
@@ -117,4 +119,14 @@ func (o *OsStat) UpdateStat() {
 		},
 	}
 	o.stat = stat
+}
+
+func GetHelpMarkdown(ctx *gin.Context) {
+	pwd, _ := os.Getwd()
+	data, err := os.ReadFile(pwd + "/static/markdown/help.md")
+	if err != nil {
+		middleware.ResponseError(ctx, 2000, err)
+		return
+	}
+	middleware.ResponseSuccess(ctx, string(data))
 }

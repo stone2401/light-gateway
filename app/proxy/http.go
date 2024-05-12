@@ -2,6 +2,7 @@ package proxy
 
 import (
 	"errors"
+	"os"
 	"strconv"
 	"strings"
 	"sync"
@@ -11,6 +12,7 @@ import (
 	"github.com/stone2401/light-gateway/app/model/dao"
 	"github.com/stone2401/light-gateway/app/model/dto"
 	"github.com/stone2401/light-gateway/app/public"
+	"github.com/stone2401/light-gateway/app/tools/db"
 	"github.com/stone2401/light-gateway/app/tools/etcd"
 	"github.com/stone2401/light-gateway/config"
 	"go.uber.org/zap/zapcore"
@@ -39,19 +41,11 @@ type HttpProxy struct {
 }
 
 func NewHttpProxy() *HttpProxy {
-	httpLimite := pcore.NewLimiter(1000)
-	httpsLimite := pcore.NewLimiter(1000)
-	httpCounter := pcore.NewCounter(30)
-	httpsCounter := pcore.NewCounter(30)
-	httpFuse := pcore.NewFuseEntry(strconv.Itoa(config.Config.Cluster.Port), 0, 100, 0.5)
-	httpsFuse := pcore.NewFuseEntry(strconv.Itoa(config.Config.Cluster.Port), 0, 100, 0.5)
 	balanc := etcd.GetMonitor().Register(strconv.Itoa(config.Config.Cluster.Port), pcore.LoadBalanceRandom)
 	httpEngin := pcore.NewEngine(balanc)
-	httpEngin.Use(httpCounter.CounterHandler, httpLimite.ProxyHandler, httpFuse.FuseHandler)
 
 	balanc2 := etcd.GetMonitor().Register(strconv.Itoa(config.Config.Cluster.SSLPort), pcore.LoadBalanceRandom)
 	httpsEngin := pcore.NewEngine(balanc2)
-	httpsEngin.Use(httpsCounter.CounterHandler, httpsLimite.ProxyHandler, httpsFuse.FuseHandler)
 	go func() {
 		err := httpEngin.Start(":" + strconv.Itoa(config.Config.Cluster.Port))
 		if err != nil {
@@ -61,7 +55,9 @@ func NewHttpProxy() *HttpProxy {
 		zlog.Zlog().Info("start http proxy", zapcore.Field{Key: "port", Type: zapcore.StringType, String: strconv.Itoa(config.Config.Cluster.Port)})
 	}()
 	go func() {
-		err := httpsEngin.StartTls(":"+strconv.Itoa(config.Config.Cluster.SSLPort), config.Config.Cluster.SSLCertFile, config.Config.Cluster.SSLKeyFile)
+		// pwd
+		pwd, _ := os.Getwd()
+		err := httpsEngin.StartTls(":"+strconv.Itoa(config.Config.Cluster.SSLPort), pwd+config.Config.Cluster.SSLCertFile, pwd+config.Config.Cluster.SSLKeyFile)
 		if err != nil {
 			zlog.Zlog().Error("start https proxy error", zapcore.Field{Key: "err", Type: zapcore.StringType, String: err.Error()})
 			return
@@ -76,15 +72,9 @@ func NewHttpProxy() *HttpProxy {
 		middlewareMap: map[string]map[string]any{
 			strconv.Itoa(config.Config.Cluster.Port): {
 				"Balance": balanc,
-				"Counter": httpCounter,
-				"Limiter": httpLimite,
-				"Fuse":    httpFuse,
 			},
 			strconv.Itoa(config.Config.Cluster.SSLPort): {
 				"Balance": balanc2,
-				"Counter": httpsCounter,
-				"Limiter": httpsLimite,
-				"Fuse":    httpsFuse,
 			},
 		},
 		deleteMap: map[string]struct{}{},
@@ -135,7 +125,7 @@ func (h *HttpProxy) Register(info *dto.ServiceAddHttpRequest) error {
 		}
 	}
 	// 2. 计数器
-	counter := pcore.NewCounter(30)
+	counter := pcore.NewCounter(info.ServiceName, 30)
 	// 3. 限流
 	limiter := pcore.NewLimiter(1000)
 	// 4. 熔断
@@ -182,6 +172,7 @@ func (h *HttpProxy) Register(info *dto.ServiceAddHttpRequest) error {
 	} else {
 		h.proxyMap[strconv.Itoa(info.ServiceHttpRule.Port)].Register(info.ServiceHttpRule.Rule, balance, headler...)
 	}
+	GetSurveillant().Register(info.ServiceName, counter)
 	return err
 }
 
@@ -192,7 +183,9 @@ func (h *HttpProxy) Update(oldInfo *dao.ServiceDetail, info *dto.ServiceAddHttpR
 	}
 	// 规则发生改变
 	if oldInfo != nil && info.ServiceHttpRule.Rule != oldInfo.HttpRule.Rule {
-		h.middlewareMap[strconv.Itoa(info.ServiceHttpRule.Port)+rule]["Status"].(*Status).Close()
+		if status, ok := h.middlewareMap[strconv.Itoa(info.ServiceHttpRule.Port)+rule]["Status"]; ok {
+			status.(*Status).Close()
+		}
 		h.Register(info)
 		return nil
 	}
@@ -201,8 +194,14 @@ func (h *HttpProxy) Update(oldInfo *dao.ServiceDetail, info *dto.ServiceAddHttpR
 		h.middlewareMap[strconv.Itoa(info.ServiceHttpRule.Port)+rule]["Status"].(*Status).Close()
 	} else {
 		h.middlewareMap[strconv.Itoa(info.ServiceHttpRule.Port)+rule]["Status"].(*Status).Open()
+		h.middlewareMap[strconv.Itoa(info.ServiceHttpRule.Port)+rule]["Counter"].(*pcore.Counter).Reset()
+		GetSurveillant().Register(info.ServiceName, h.middlewareMap[strconv.Itoa(info.ServiceHttpRule.Port)+rule]["Counter"].(*pcore.Counter))
 	}
 
+	// 2. 计数器
+	if oldInfo == nil || oldInfo.Info.ServiceName != info.ServiceName {
+		GetSurveillant().Rename(oldInfo.Info.ServiceName, info.ServiceName)
+	}
 	// 6. 黑白名单
 	if oldInfo == nil || info.ServiceAccessControl.BlackList != oldInfo.AccessControl.BlackList || info.ServiceAccessControl.WhiteList != oldInfo.AccessControl.WhiteList {
 		access := h.middlewareMap[strconv.Itoa(info.Port)+rule]["AccessControl"].(*AccessControl)
@@ -236,4 +235,56 @@ func (h *HttpProxy) Remove(info *dao.ServiceDetail) error {
 		h.deleteMap[strconv.Itoa(info.HttpRule.Port)+rule] = struct{}{}
 	}
 	return nil
+}
+
+func (h *HttpProxy) Init() {
+	// 获取所有服务
+	services := []*dao.ServiceInfo{}
+	err := db.GetDBDriver().Table(&dao.ServiceInfo{}).
+		Where("load_type = ? and status = ?", public.LoadTypeHttp, public.StatusUp).Find(&services)
+	if err != nil {
+		return
+	}
+	for _, info := range services {
+		detail := dao.ServiceDetail{Info: info}
+		err := detail.FindAll()
+		if err != nil {
+			continue
+		}
+		if detail.HttpRule.Port == 0 {
+			continue
+		}
+		h.Register(&dto.ServiceAddHttpRequest{
+			ServiceName: detail.Info.ServiceName,
+			ServiceDesc: detail.Info.ServiceDesc,
+			Status:      detail.Info.Status,
+			ServiceHttpRule: dto.ServiceHttpRule{
+				Port:           detail.HttpRule.Port,
+				RuleType:       detail.HttpRule.RuleType,
+				Rule:           detail.HttpRule.Rule,
+				NeedHttps:      detail.HttpRule.NeedHttps,
+				NeedStripUrl:   detail.HttpRule.NeedStripUrl,
+				NeedWebsocket:  detail.HttpRule.NeedWebsocket,
+				UrlRewrite:     detail.HttpRule.UrlRewrite,
+				HeaderTransfor: detail.HttpRule.HeaderTransfor,
+			},
+			ServiceAccessControl: dto.ServiceAccessControl{
+				OpenAuth:          detail.AccessControl.OpenAuth,
+				BlackList:         detail.AccessControl.BlackList,
+				WhiteList:         detail.AccessControl.WhiteList,
+				ClientipFlowLimit: detail.AccessControl.ClientipFlowLimit,
+				ServiceFlowLimit:  detail.AccessControl.ServiceFlowLimit,
+			},
+			ServiceLoadBalance: dto.ServiceLoadBalance{
+				RoundType:              detail.LoadBalance.RoundType,
+				IpList:                 detail.LoadBalance.IpList,
+				WeightList:             detail.LoadBalance.WeightList,
+				ForbidList:             detail.LoadBalance.ForbidList,
+				UpstreamConnectTimeout: detail.LoadBalance.UpstreamConnectTimeout,
+				UpstreamHeaderTimeout:  detail.LoadBalance.UpstreamHeaderTimeout,
+				UpstreamIdleTimeout:    detail.LoadBalance.UpstreamIdleTimeout,
+				UpstreamMaxIdle:        detail.LoadBalance.UpstreamMaxIdle,
+			},
+		})
+	}
 }

@@ -10,6 +10,9 @@ const (
 	EndMark               = "。"
 	CAPTCHAKEY            = "captcha"
 	CAPTCHALEN            = 5
+
+	StatusUp   = 1
+	StatusDown = 0
 )
 
 var (

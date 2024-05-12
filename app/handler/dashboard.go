@@ -90,3 +90,17 @@ func ServiceStatAll(ctx *gin.Context) {
 	// 发送
 	middleware.ResponseSuccess(ctx, serviceStat)
 }
+
+// @Summary 指标统计
+// @Description 指标统计
+// @Tags 大盘
+// @ID /dashboard/
+// @Param Authorization	header string true "token"
+// @Security ApiKeyAuth
+// @Accept application/json
+// @Produce json
+// @Success 200 {object} middleware.ResponseErr{data=dto.ServiceStatAllResponse} "success"
+// @Router /api/v1/dashboard/ [get]
+func Dashboard(ctx *gin.Context) {
+	middleware.ResponseSuccess(ctx, "ok")
+}

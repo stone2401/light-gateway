@@ -5,7 +5,6 @@ import (
 
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/stone2401/light-gateway/app/tools/db"
-	"github.com/stone2401/light-gateway/config"
 )
 
 // 要被初始化的 dao
@@ -27,9 +26,6 @@ func Init() {
 		// for _, funcItem := range initFunc {
 		// 	funcItem()
 		// }
-		if config.Mode {
-			db.GetDBDriver().Logger().ShowSQL(config.Mode)
-		}
 	}()
 }
 

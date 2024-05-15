@@ -1,7 +1,9 @@
 package dao
 
 import (
+	"fmt"
 	"strings"
+	"time"
 
 	"github.com/stone2401/light-gateway-kernel/pkg/zlog"
 	"github.com/stone2401/light-gateway/app/tools/db"
@@ -67,7 +69,7 @@ type Qps struct {
 func (q *Qps) InsertOrUpdate(key string, value int64) {
 	// key 是通过 # 分割的
 	keys := strings.Split(key, "#")
-	serviceName := strings.Join(keys[:len(keys)-2], "#")
+	serviceName := strings.Join(keys[:len(keys)-1], "#")
 	timeString := keys[len(keys)-1]
 	// timeString 最后2位置是小时，需要截取出来
 	hour := timeString[len(timeString)-2:]
@@ -89,15 +91,20 @@ func (q *Qps) InsertOrUpdate(key string, value int64) {
 		}
 		qps.ServiceId = int64(info.Id)
 	}
-
-	if hour == "00" {
-		_, err := session.InsertOne(qps)
+	//  判断是否存在
+	ok, err := session.Where("service_id = ? and time = ?", qps.ServiceId, qps.Time).Exist(&Qps{})
+	if err != nil {
+		return
+	}
+	fmt.Println(key, ok, serviceName)
+	if !ok {
+		_, err := session.AllCols().InsertOne(qps)
 		if err != nil {
 			zlog.Zlog().Error("insert qps error", zapcore.Field{Key: "err", Type: zapcore.StringType, String: err.Error()})
 		}
 		return
 	} else {
-		_, err := session.Update(qps)
+		_, err := session.Where("service_id = ? and time = ?", qps.ServiceId, qps.Time).Update(qps)
 		if err != nil {
 			zlog.Zlog().Error("update qps error", zapcore.Field{Key: "err", Type: zapcore.StringType, String: err.Error()})
 		}
@@ -157,5 +164,75 @@ func (q *Qps) SetHour(hour string, value int64) {
 		q.Hour23 = value
 	default:
 		zlog.Zlog().Error("set hour error", zapcore.Field{Key: "err", Type: zapcore.StringType, String: "set hour error"})
+	}
+}
+
+func (q *Qps) GetQps() int64 {
+	return q.Hour + q.Hour1 + q.Hour2 + q.Hour3 + q.Hour4 + q.Hour5 + q.Hour6 + q.Hour7 +
+		q.Hour8 + q.Hour9 + q.Hour10 + q.Hour11 + q.Hour12 + q.Hour13 + q.Hour14 + q.Hour15 +
+		q.Hour16 + q.Hour17 + q.Hour18 + q.Hour19 + q.Hour20 + q.Hour21 + q.Hour22 + q.Hour23
+}
+
+func (q *Qps) GetHour() int64 {
+	hour := time.Now().Hour()
+	switch hour {
+	case 0:
+		return q.Hour
+	case 1:
+		return q.Hour1
+	case 2:
+		return q.Hour2
+	case 3:
+		return q.Hour3
+	case 4:
+		return q.Hour4
+	case 5:
+		return q.Hour5
+	case 6:
+		return q.Hour6
+	case 7:
+		return q.Hour7
+	case 8:
+		return q.Hour8
+	case 9:
+		return q.Hour9
+	case 10:
+		return q.Hour10
+	case 11:
+		return q.Hour11
+	case 12:
+		return q.Hour12
+	case 13:
+		return q.Hour13
+	case 14:
+		return q.Hour14
+	case 15:
+		return q.Hour15
+	case 16:
+		return q.Hour16
+	case 17:
+		return q.Hour17
+	case 18:
+		return q.Hour18
+	case 19:
+		return q.Hour19
+	case 20:
+		return q.Hour20
+	case 21:
+		return q.Hour21
+	case 22:
+		return q.Hour22
+	case 23:
+		return q.Hour23
+	default:
+		return 0
+	}
+}
+
+func (q *Qps) GetDay() []int64 {
+	return []int64{
+		q.Hour, q.Hour1, q.Hour2, q.Hour3, q.Hour4, q.Hour5, q.Hour6, q.Hour7,
+		q.Hour8, q.Hour9, q.Hour10, q.Hour11, q.Hour12, q.Hour13, q.Hour14, q.Hour15,
+		q.Hour16, q.Hour17, q.Hour18, q.Hour19, q.Hour20, q.Hour21, q.Hour22, q.Hour23,
 	}
 }

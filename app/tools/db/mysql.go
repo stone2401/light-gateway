@@ -9,7 +9,6 @@ import (
 	"github.com/stone2401/light-gateway/config"
 	"xorm.io/xorm"
 
-	xormLog "xorm.io/xorm/log"
 	"xorm.io/xorm/names"
 )
 
@@ -32,9 +31,10 @@ func GetDBDriver() *xorm.Engine {
 		engine.SetMaxOpenConns(30)
 		engine.SetMaxIdleConns(10)
 		engine.SetConnMaxLifetime(30 * time.Minute)
+		engine.ShowSQL(true)
 		// 日志打印设置
-		// engine.SetLogger(xormLog.NewSimpleLogger(config.GenLogFilename("xorm")))
-		engine.Logger().SetLevel(xormLog.LOG_DEBUG)
+		// engine.SetLogger()
+		// engine.Logger().SetLevel(xormLog.LOG_DEBUG)
 		// 设置前缀
 		tbMapper := names.NewPrefixMapper(names.SnakeMapper{}, "gateway_")
 		engine.SetTableMapper(tbMapper)

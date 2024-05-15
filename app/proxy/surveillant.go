@@ -2,6 +2,7 @@ package proxy
 
 import (
 	"context"
+	"strconv"
 	"sync"
 	"time"
 
@@ -53,6 +54,7 @@ func (s *Surveillant) Watch() {
 				zlog.Zlog().Error("redisGoCmd.Int()", zapcore.Field{Key: "err", Type: zapcore.StringType, String: err.Error()})
 				continue
 			}
+			zlog.Zlog().Info("val", zapcore.Field{Key: "val", Type: zapcore.StringType, String: strconv.Itoa(int(val))})
 			qps := &dao.Qps{}
 			qps.InsertOrUpdate(key, val)
 		}

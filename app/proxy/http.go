@@ -127,9 +127,9 @@ func (h *HttpProxy) Register(info *dto.ServiceAddHttpRequest) error {
 	// 2. 计数器
 	counter := pcore.NewCounter(info.ServiceName, 30)
 	// 3. 限流
-	limiter := pcore.NewLimiter(1000)
+	// limiter := pcore.NewLimiter(1000)
 	// 4. 熔断
-	fuse := pcore.NewFuseEntry(strconv.Itoa(info.ServiceHttpRule.Port)+rule, 0, 100, 0.5)
+	// fuse := pcore.NewFuseEntry(strconv.Itoa(info.ServiceHttpRule.Port)+rule, 0, 100, 0.5)
 
 	// 6. 黑白名单
 	if info.ServiceAccessControl.BlackList != "" || info.ServiceAccessControl.WhiteList != "" {
@@ -139,7 +139,8 @@ func (h *HttpProxy) Register(info *dto.ServiceAddHttpRequest) error {
 		headler = append(headler, access.AccessControlHeadler)
 		h.middlewareMap[strconv.Itoa(info.ServiceHttpRule.Port)+rule]["AccessControl"] = access
 	}
-	headler = append(headler, counter.CounterHandler, limiter.ProxyHandler, fuse.FuseHandler)
+	// headler = append(headler, counter.CounterHandler, limiter.ProxyHandler, fuse.FuseHandler)
+	headler = append(headler, counter.CounterHandler)
 	// 7. header 重写
 	if info.ServiceHttpRule.HeaderTransfor != "" {
 		header := NewResetHeader()
@@ -159,8 +160,8 @@ func (h *HttpProxy) Register(info *dto.ServiceAddHttpRequest) error {
 	// 初始化中间件
 	h.middlewareMap[strconv.Itoa(info.ServiceHttpRule.Port)+rule] = map[string]any{
 		"Counter": counter,
-		"Limiter": limiter,
-		"Fuse":    fuse,
+		// "Limiter": limiter,
+		// "Fuse":    fuse,
 		"Balance": balance,
 		"Status":  status,
 	}

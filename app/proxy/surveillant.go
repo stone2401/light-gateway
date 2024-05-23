@@ -2,6 +2,7 @@ package proxy
 
 import (
 	"context"
+	"fmt"
 	"strconv"
 	"sync"
 	"time"
@@ -99,6 +100,7 @@ func (s *Surveillant) Register(serviceName string, counter *pcore.Counter) {
 			} else {
 				redisGo.GetRedisConn().Set(context.Background(), keyAll, qps.Count, time.Hour*3)
 			}
+			fmt.Println(key, qps.Count)
 		}
 	}()
 }

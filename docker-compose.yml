@@ -8,7 +8,7 @@ services:
       MYSQL_ROOT_PASSWORD: 123456123
       TZ: Asia/Shanghai
     ports:
-      - 3306:3306
+      - 0.0.0.0:3306:3306
     volumes:
       - ./data/mysql-files:/var/lib/mysql-files
       - ./data/mysql:/var/lib/mysql
@@ -19,7 +19,7 @@ services:
     container_name: redis
     command: redis-server /usr/local/etc/redis/redis.conf
     ports:
-      - 6379:6379
+      - 0.0.0.0:6379:6379
     volumes:
       - ./data/redis:/data
       - ./conf/redis/redis.conf:/usr/local/etc/redis/redis.conf
@@ -30,6 +30,6 @@ services:
       - ALLOW_NONE_AUTHENTICATION=yes
       - ETCD_ADVERTISE_CLIENT_URLS=http://etcd:2379
     ports:
-      - 2379:2379
-      - 2380:2380
+      - 0.0.0.0:2379:2379
+      - 0.0.0.0:2380:2380
 # auth !Shizhenfei123

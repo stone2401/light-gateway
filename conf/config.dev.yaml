@@ -1,12 +1,12 @@
 DriverName: mysql
 Mysql:
-    host: 127.0.0.1
+    host: 192.168.1.13
     port: 3306
     username: root
     password: 123456123
     database: go_gateway
 Redis:
-    host: localhost
+    host: 192.168.1.13
     port: 6379
     password: "!Shizhenfei123"
     database: 0
@@ -20,4 +20,4 @@ Cluster:
     ssl_port: 4880
 Etcd:
     endpoints:
-        - 127.0.0.1:2379
+        - 192.168.1.13:2379

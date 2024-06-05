@@ -20,7 +20,10 @@ func Init() {
 	var b []byte
 	_, filename, _, _ := runtime.Caller(0)
 	pwd = path.Dir(filename)
-	s := os.Getenv("GIN_MODE")
+	s := "dev"
+	if len(os.Args) > 1 {
+		s = os.Args[1]
+	}
 	if s == "dev" {
 		readConfigFile(&b, pwd, "../conf/config.dev.yaml")
 	} else if s == "prod" {
@@ -28,7 +31,7 @@ func Init() {
 		readConfigFile(&b, pwd, "../conf/config.prod.yaml")
 	} else {
 		Mode = false
-		readConfigFile(&b, pwd, "../conf/config.prod.yaml")
+		readConfigFile(&b, pwd, "../conf/config.dev.yaml")
 	}
 	err2 := yaml.Unmarshal(b, &Config)
 	if err2 != nil {
